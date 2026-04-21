@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mezuka Bot — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#4ecdc4;
+  --teal-d:#2bb5ab;
+  --teal-dd:#1a8f87;
+  --teal-l:#7eddd7;
+  --teal-xl:#b2ebe8;
+  --teal-bg:#e8faf9;
+  --teal-bg2:#f0fdfc;
+  --pink:#ff6b9d;
+  --pink-l:#ffb3cc;
+  --dark:#1a2e2e;
+  --dark2:#2a3d3d;
+  --gray:#6b8080;
+  --gray-l:#a0b8b8;
+  --white:#fff;
+  /* Aliases for compat */
+  --gb: rgba(78,205,196,0.06);
+  --gb2: rgba(78,205,196,0.04);
+  --gb3: rgba(78,205,196,0.02);
+  --gbd: rgba(78,205,196,0.18);
+  --gbd2: rgba(78,205,196,0.1);
+  --gbs: 0 4px 24px rgba(78,205,196,0.13), 0 1px 4px rgba(0,0,0,0.04);
+  --gbs2: 0 2px 12px rgba(78,205,196,0.1), 0 1px 3px rgba(0,0,0,0.03);
+  --blur: blur(24px) saturate(180%);
+  --blur2: blur(16px) saturate(160%);
+  --blur3: blur(10px) saturate(140%);
+  --text: #1a2e2e;
+  --text2: #4a6060;
+  --text3: #8aacac;
+  --green: #2ecc71;
+  --green-bg: rgba(46,204,113,0.1);
+  --green-light: #2ecc71;
+  --blue: #2bb5ab;
+  --blue-bg: rgba(78,205,196,0.12);
+  --blue-light: #4ecdc4;
+  --teal-bg-var: rgba(78,205,196,0.1);
+  --purple-bg: rgba(78,205,196,0.08);
+  --red: #e05555;
+  --red-bg: rgba(224,85,85,0.1);
+  --red-light: #e05555;
+  --yellow: #f0a500;
+  --yellow-bg: rgba(240,165,0,0.1);
+  --pink-bg: rgba(255,107,157,0.08);
+  --card-s: 0 4px 24px rgba(78,205,196,0.13);
+  --card-sh: 0 12px 40px rgba(78,205,196,0.22);
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Nunito',system-ui,sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  background:var(--teal-bg2);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ══════════════════════════════
+   LIGHT TEAL BACKGROUND
+══════════════════════════════ */
+.bg-mesh{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78,205,196,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255,107,157,0.07) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234ecdc4' fill-opacity='0.025'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+.bg-mesh::after{content:none}
+.orb{display:none}
+
+/* ══════════════════════════════
+   LOGIN
+══════════════════════════════ */
+#login-screen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:var(--teal-bg2)}
+.login-box{
+  position:relative;z-index:1;
+  background:white;
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:28px;
+  padding:40px 38px 36px;
+  width:100%;max-width:390px;margin:16px;
+  box-shadow:0 8px 48px rgba(78,205,196,0.18);
+  animation:loginPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes loginPop{from{opacity:0;transform:scale(0.88) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.login-logo{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.login-logo-icon{
+  width:46px;height:46px;border-radius:14px;overflow:hidden;
+  border:1.5px solid rgba(78,205,196,0.3);
+  box-shadow:0 6px 22px rgba(78,205,196,0.22);
+  flex-shrink:0;
+}
+.login-logo-text{font-size:16px;font-weight:800;letter-spacing:-0.3px;color:var(--dark)}
+.login-logo-text small{display:block;font-size:9.5px;font-weight:600;color:var(--gray-l);letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.login-sub{font-size:13px;color:var(--gray);margin-bottom:32px;padding-left:68px}
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:12px;font-weight:700;color:var(--gray);margin-bottom:7px}
+.lf input{
+  width:100%;
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:11px;color:var(--dark);
+  font-family:'Nunito',sans-serif;font-size:13px;
+  padding:11px 14px;outline:none;
+  transition:all 0.22s;
+}
+.lf input:focus{
+  border-color:rgba(78,205,196,0.5);
+  background:white;
+  box-shadow:0 0 0 3px rgba(78,205,196,0.12);
+}
+.lf input::placeholder{color:var(--gray-l)}
+.login-btn{
+  width:100%;margin-top:10px;padding:12px;
+  background:linear-gradient(145deg,var(--teal),var(--teal-d));
+  border:none;
+  border-radius:12px;color:#fff;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;
+  cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.4,0.64,1);
+  box-shadow:0 4px 18px rgba(78,205,196,0.32);
+  letter-spacing:-0.1px;
+}
+.login-btn:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 8px 26px rgba(78,205,196,0.42)}
+.login-btn:active{transform:scale(0.97)}
+.login-err{
+  margin-top:12px;font-size:12px;color:var(--red);text-align:center;display:none;
+  padding:10px 14px;
+  background:rgba(224,85,85,0.08);
+  border-radius:10px;border:1px solid rgba(224,85,85,0.2);
+}
+
+/* ══════════════════════════════
+   APP WRAP
+══════════════════════════════ */
+.wrap{position:relative;z-index:1;display:none;min-height:100vh}
+
+/* ══════════════════════════════
+   SIDEBAR
+══════════════════════════════ */
+.sidebar{
+  width:250px;min-height:100vh;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-right:1px solid rgba(78,205,196,0.18);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:50;
+  box-shadow:4px 0 24px rgba(78,205,196,0.1);
+}
+.sb-head{padding:26px 18px 18px;border-bottom:1px solid rgba(78,205,196,0.12)}
+.bot-identity{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.bot-logo{
+  width:44px;height:44px;border-radius:14px;overflow:hidden;
+  border:1.5px solid rgba(78,205,196,0.3);
+  box-shadow:0 4px 14px rgba(78,205,196,0.2);
+  flex-shrink:0;
+}
+.bot-logo img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.bot-name{font-size:12px;font-weight:800;letter-spacing:-0.2px;line-height:1.3;color:var(--dark)}
+.bot-name small{display:block;font-size:9.5px;font-weight:500;color:var(--gray-l);letter-spacing:0.3px}
+.status-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(46,204,113,0.1);
+  border:1px solid rgba(46,204,113,0.25);
+  border-radius:100px;padding:5px 12px;
+  font-size:10px;font-weight:700;color:var(--green);letter-spacing:0.8px;
+  font-family:'JetBrains Mono',monospace;
+}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green-light);box-shadow:0 0 6px var(--green-light);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)}}
+.sb-nav{padding:14px 10px;flex:1;overflow-y:auto}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(78,205,196,0.2);border-radius:100px}
+.nav-group{margin-bottom:22px}
+.nav-group-label{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-l);padding:0 10px;margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:9px 11px;border-radius:11px;
+  background:none;border:none;
+  color:var(--gray);font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:600;
+  cursor:pointer;transition:all 0.18s;text-align:left;
+}
+.nav-btn:hover{background:rgba(78,205,196,0.08);color:var(--dark)}
+.nav-btn.active{
+  background:rgba(78,205,196,0.12);
+  color:var(--teal-d);font-weight:700;
+  border:1px solid rgba(78,205,196,0.22);
+}
+.nav-btn .ni{font-size:15px;width:20px;text-align:center}
+.sb-footer{padding:14px;border-top:1px solid rgba(78,205,196,0.12)}
+.owner-row{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;
+  border-radius:12px;
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.15);
+}
+.owner-av{
+  width:32px;height:32px;border-radius:9px;overflow:hidden;
+  border:1.5px solid rgba(78,205,196,0.3);
+  flex-shrink:0;
+}
+.owner-av img{width:100%;height:100%;object-fit:cover;border-radius:7px}
+.owner-info{flex:1;min-width:0}
+.owner-num{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dark)}
+.owner-loc{font-size:10px;color:var(--gray-l)}
+.btn-logout{
+  margin-top:8px;width:100%;padding:9px;
+  background:rgba(224,85,85,0.07);
+  border:1px solid rgba(224,85,85,0.18);
+  color:var(--red);border-radius:10px;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-logout:hover{background:rgba(224,85,85,0.13)}
+.made-by{margin-top:8px;text-align:center;font-size:9.5px;color:var(--gray-l);letter-spacing:0.3px;font-family:'JetBrains Mono',monospace}
+.made-by span{color:var(--teal-d);font-weight:700}
+/* ══════════════════════════════
+   MAIN CONTENT
+══════════════════════════════ */
+.main{margin-left:250px;flex:1;padding:28px 28px 100px;max-width:calc(100% - 250px)}
+.page-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;gap:20px;animation:fadeUp 0.5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-size:22px;font-weight:900;letter-spacing:-0.7px;color:var(--dark);line-height:1;margin-bottom:4px}
+.page-title span{
+  background:linear-gradient(135deg,var(--teal),var(--teal-d),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.page-sub{font-size:11px;color:var(--gray-l)}
+.top-actions{display:flex;gap:8px;flex-shrink:0}
+.settings-grid{display:flex;flex-direction:column;gap:28px}
+.section{animation:fadeUp 0.5s ease both}
+.section:nth-child(1){animation-delay:.04s}.section:nth-child(2){animation-delay:.08s}.section:nth-child(3){animation-delay:.12s}.section:nth-child(4){animation-delay:.16s}.section:nth-child(5){animation-delay:.20s}.section:nth-child(6){animation-delay:.24s}.section:nth-child(7){animation-delay:.28s}.section:nth-child(8){animation-delay:.32s}
+.section-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.section-icon{
+  width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
+  border:1px solid rgba(78,205,196,0.2);
+}
+.si-green{background:rgba(46,204,113,0.1)}
+.si-blue{background:rgba(78,205,196,0.12)}
+.si-yellow{background:rgba(240,165,0,0.1)}
+.si-red{background:rgba(224,85,85,0.1)}
+.si-purple{background:rgba(78,205,196,0.08)}
+.section-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-family:'JetBrains Mono',monospace}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(78,205,196,0.15),transparent)}
+
+/* ══════════════════════════════
+   CARD
+══════════════════════════════ */
+.card{
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:20px;overflow:hidden;
+  box-shadow:var(--card-s);
+}
+.sr{
+  display:flex;align-items:center;padding:13px 17px;
+  border-bottom:1px solid rgba(78,205,196,0.08);
+  gap:13px;transition:background 0.15s;
+}
+.sr:last-child{border-bottom:none}
+.sr:hover{background:rgba(78,205,196,0.04)}
+.sr-ico{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  border:1px solid rgba(78,205,196,0.15);
+}
+.sr-info{flex:1;min-width:0}
+.sr-label{font-size:12.5px;font-weight:600;margin-bottom:1px;color:var(--dark)}
+.sr-key{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--gray-l);letter-spacing:0.2px}
+.sr-ctrl{flex-shrink:0;display:flex;align-items:center;gap:8px}
+
+/* ══════════════════════════════
+   TOGGLE
+══════════════════════════════ */
+.toggle{
+  width:51px;height:31px;border-radius:100px;
+  background:rgba(78,205,196,0.15);
+  border:1px solid rgba(78,205,196,0.2);
+  position:relative;cursor:pointer;
+  transition:all 0.38s cubic-bezier(0.34,1.2,0.64,1);
+  flex-shrink:0;
+}
+.toggle::after{
+  content:'';position:absolute;
+  width:25px;height:25px;border-radius:50%;
+  background:white;
+  top:2px;left:2px;
+  transition:all 0.38s cubic-bezier(0.34,1.3,0.64,1);
+  box-shadow:0 2px 8px rgba(78,205,196,0.25);
+}
+.toggle.on{
+  background:linear-gradient(145deg,var(--teal),var(--teal-d));
+  border-color:rgba(78,205,196,0.4);
+  box-shadow:0 0 16px rgba(78,205,196,0.25);
+}
+.toggle.on::after{left:calc(100% - 27px)}
+
+/* ══════════════════════════════
+   SELECT
+══════════════════════════════ */
+.sel-wrap{position:relative}
+.sel{
+  appearance:none;
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:10px;color:var(--dark);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;
+  padding:8px 28px 8px 12px;cursor:pointer;outline:none;
+  transition:all 0.2s;min-width:115px;
+}
+.sel:hover,.sel:focus{
+  border-color:rgba(78,205,196,0.45);
+  background:white;
+  box-shadow:0 0 0 3px rgba(78,205,196,0.1);
+}
+.sel option{background:white;color:var(--dark)}
+.sel-wrap::after{
+  content:'⌄';position:absolute;right:9px;top:50%;
+  transform:translateY(-52%);pointer-events:none;
+  color:var(--gray-l);font-size:14px;font-weight:600;
+}
+
+/* ══════════════════════════════
+   INPUT
+══════════════════════════════ */
+.inp{
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:10px;color:var(--dark);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:500;
+  padding:8px 12px;outline:none;transition:all 0.2s;width:175px;
+}
+.inp:focus{
+  border-color:rgba(78,205,196,0.5);
+  background:white;
+  box-shadow:0 0 0 3px rgba(78,205,196,0.12);
+}
+.inp::placeholder{color:var(--gray-l)}
+.inp-mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+.img-preview{
+  width:38px;height:38px;border-radius:10px;object-fit:cover;
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);flex-shrink:0;
+}
+.list-area{
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:10px;padding:10px 12px;min-height:64px;
+  width:100%;resize:vertical;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--dark);outline:none;transition:all 0.2s;line-height:1.7;
+}
+.list-area:focus{
+  border-color:rgba(78,205,196,0.45);
+  background:white;
+  box-shadow:0 0 0 3px rgba(78,205,196,0.1);
+}
+
+/* ══════════════════════════════
+   BUTTONS
+══════════════════════════════ */
+.btn{
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  padding:8px 16px;border-radius:11px;border:none;cursor:pointer;outline:none;
+  transition:all 0.22s cubic-bezier(0.34,1.2,0.64,1);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{
+  background:linear-gradient(145deg,var(--teal),var(--teal-d));
+  color:#fff;
+  border:none;
+  box-shadow:0 4px 16px rgba(78,205,196,0.32);
+}
+.btn-primary:hover{transform:translateY(-1px) scale(1.02);box-shadow:0 7px 22px rgba(78,205,196,0.42)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-ghost{
+  background:white;
+  border:1.5px solid rgba(78,205,196,0.25);color:var(--dark);
+  box-shadow:var(--gbs2);
+}
+.btn-ghost:hover{background:var(--teal-bg);border-color:var(--teal)}
+.btn-danger{
+  background:rgba(224,85,85,0.08);
+  border:1px solid rgba(224,85,85,0.2);color:var(--red);
+}
+.btn-danger:hover{background:rgba(224,85,85,0.14)}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+/* ══════════════════════════════
+   SAVE BAR
+══════════════════════════════ */
+.save-bar{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(120px);
+  background:white;
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:22px;padding:14px 20px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 8px 40px rgba(78,205,196,0.2);
+  z-index:200;
+  transition:transform 0.42s cubic-bezier(0.34,1.56,0.64,1);
+  min-width:340px;
+}
+.save-bar.visible{transform:translateX(-50%) translateY(0)}
+.sb-indicator{width:8px;height:8px;border-radius:50%;background:var(--yellow);box-shadow:0 0 8px var(--yellow);flex-shrink:0;animation:pulse 1.5s infinite}
+.sb-text{flex:1}
+.sb-text strong{display:block;font-size:12px;font-weight:700;color:var(--dark)}
+.sb-text small{font-size:11px;color:var(--gray-l)}
+
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+.toast{
+  position:fixed;top:24px;right:24px;
+  background:white;
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:17px;padding:13px 18px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 32px rgba(78,205,196,0.18);
+  z-index:300;opacity:0;transform:translateX(30px) scale(0.95);
+  transition:all 0.38s cubic-bezier(0.34,1.56,0.64,1);
+  font-size:14px;font-weight:600;color:var(--dark);
+}
+.toast.show{opacity:1;transform:translateX(0) scale(1)}
+
+/* ══════════════════════════════
+   AUTO REPLY & SCHEDULED
+══════════════════════════════ */
+.count-chip{
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  background:rgba(78,205,196,0.1);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:100px;padding:4px 11px;color:var(--teal-d);
+}
+.sys-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 17px;
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:17px;margin-bottom:12px;
+  box-shadow:var(--card-s);
+}
+.sys-row-info strong{display:block;font-size:13px;font-weight:700;margin-bottom:2px;color:var(--dark)}
+.sys-row-info small{font-size:11px;color:var(--gray-l)}
+.add-form{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
+  padding:18px;
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:17px;margin-bottom:12px;
+  box-shadow:var(--card-s);
+}
+.afc{display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px}
+.afc label{font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+.afc input,.afc textarea,.afc select{
+  background:var(--teal-bg);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:10px;color:var(--dark);
+  font-family:'Nunito',sans-serif;font-size:12px;
+  padding:9px 12px;outline:none;transition:all 0.2s;resize:none;width:100%;
+}
+.afc input:focus,.afc textarea:focus,.afc select:focus{
+  border-color:rgba(78,205,196,0.45);
+  background:white;
+  box-shadow:0 0 0 3px rgba(78,205,196,0.1);
+}
+.afc select option{background:white;color:var(--dark)}
+.ar-item{
+  display:flex;align-items:flex-start;gap:13px;padding:13px 17px;
+  border-bottom:1px solid rgba(78,205,196,0.08);
+  transition:background 0.15s;animation:fadeUp 0.3s ease both;
+}
+.ar-item:last-child{border-bottom:none}
+.ar-item:hover{background:rgba(78,205,196,0.04)}
+.ar-item-ico{
+  width:34px;height:34px;border-radius:10px;
+  background:rgba(46,204,113,0.1);
+  border:1px solid rgba(46,204,113,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px;
+}
+.ar-item-body{flex:1;min-width:0}
+.ar-tag{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  color:var(--teal-d);background:rgba(78,205,196,0.1);
+  border:1px solid rgba(78,205,196,0.2);border-radius:6px;padding:3px 9px;margin-bottom:6px;
+}
+.ar-txt{font-size:12px;color:var(--gray);white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:50px;overflow:hidden}
+.sch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(262px,1fr));gap:10px}
+.sch-card{
+  background:white;
+  border:1px solid rgba(78,205,196,0.14);
+  border-radius:16px;padding:16px;animation:fadeUp 0.3s ease both;
+  box-shadow:var(--card-s);
+}
+.sch-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.sch-to-name{font-size:13px;font-weight:700;color:var(--dark)}
+.sch-to-num{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gray-l);margin-top:2px}
+.sch-day-tag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+  background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);
+  color:var(--teal-d);border-radius:6px;padding:3px 9px;white-space:nowrap;
+}
+.sch-msg{font-size:11px;color:var(--gray);line-height:1.5;margin-bottom:10px;max-height:42px;overflow:hidden;word-break:break-word}
+.sch-footer{display:flex;justify-content:space-between;align-items:center}
+.sch-last{font-size:10px;color:var(--gray-l)}
+.loading-row{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--gray);font-size:13px}
+.spinner{width:18px;height:18px;border:2px solid rgba(78,205,196,0.2);border-top-color:var(--teal);border-radius:50%;animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray-l);font-size:13px}
+.empty-state .ei{font-size:34px;margin-bottom:12px;opacity:0.45}
+
+/* ── STARTUP NOTIFICATION ── */
+.startup-notif{
+  position:fixed;bottom:28px;right:24px;z-index:600;
+  display:flex;align-items:flex-start;gap:12px;
+  background:white;
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:18px;padding:14px 16px;
+  max-width:290px;
+  box-shadow:0 8px 40px rgba(78,205,196,0.2);
+  transform:translateY(110%) scale(0.92);opacity:0;
+  transition:all 0.5s cubic-bezier(0.34,1.4,0.64,1);
+  pointer-events:none;
+}
+.startup-notif.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.sn-icon{width:38px;height:38px;border-radius:11px;overflow:hidden;flex-shrink:0;border:1px solid rgba(78,205,196,0.2)}
+.sn-icon img{width:100%;height:100%;object-fit:cover}
+.sn-body{flex:1;min-width:0}
+.sn-title{font-size:12px;font-weight:800;color:var(--dark);margin-bottom:2px;letter-spacing:-0.1px}
+.sn-msg{font-size:11px;color:var(--gray);line-height:1.45}
+.sn-time{font-size:9.5px;color:var(--teal-d);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.sn-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--gray-l);cursor:pointer;font-size:13px;line-height:1;padding:2px;transition:color 0.15s}
+.sn-close:hover{color:var(--dark)}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);z-index:200;transition:transform 0.3s cubic-bezier(0.34,1.2,0.64,1)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:22px 16px 110px;max-width:100%}
+  .menu-btn{display:flex !important}
+  .sch-grid{grid-template-columns:1fr}
+  .page-title{font-size:24px}
+}
+.menu-btn{
+  display:none;position:fixed;top:16px;left:16px;z-index:150;
+  background:white;
+  border:1px solid rgba(78,205,196,0.2);border-radius:11px;
+  padding:9px 11px;cursor:pointer;font-size:16px;color:var(--dark);
+  box-shadow:var(--card-s);
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--teal-bg2)}
+::-webkit-scrollbar-thumb{background:var(--teal-xl);border-radius:100px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND MESH -->
+<div class="bg-mesh">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><img src="https://files.catbox.moe/qhrzt2.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:13px;"></div>
+      <div class="login-logo-text">Mezuka Bot<small>SETTINGS PANEL</small></div>
+    </div>
+    <div class="login-sub">Sign in with your bot number & password</div>
+    <div class="lf"><label>WhatsApp Number</label><input type="tel" id="l-num" placeholder="94712345678" autocomplete="off"></div>
+    <div class="lf"><label>Bot Password</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="wrap" id="app-wrap">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="bot-identity">
+      <div class="bot-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></div>
+      <div><div class="bot-name">MEZUKA BOT<small>MD MINI BOT v3</small></div></div>
+    </div>
+    <div class="status-pill"><span class="dot"></span>ONLINE</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Config</div>
+      <button class="nav-btn active" onclick="goTo('general',this)"><span class="ni">⚙️</span>General</button>
+      <button class="nav-btn" onclick="goTo('auto',this)"><span class="ni">🤖</span>Auto Features</button>
+      <button class="nav-btn" onclick="goTo('media',this)"><span class="ni">🖼️</span>Media & Links</button>
+      <button class="nav-btn" onclick="goTo('msg',this)"><span class="ni">💬</span>Messages</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Access</div>
+      <button class="nav-btn" onclick="goTo('access',this)"><span class="ni">🔐</span>Access Control</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Group Features</div>
+      <button class="nav-btn" onclick="goTo('antilink',this)"><span class="ni">🔗</span>Anti Link</button>
+      <button class="nav-btn" onclick="goTo('antibad',this)"><span class="ni">🤬</span>Anti Bad Word</button>
+      <button class="nav-btn" onclick="goTo('greetings',this)"><span class="ni">👋</span>Welcome / Goodbye</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Smart Features</div>
+      <button class="nav-btn" onclick="goTo('autoreply',this)"><span class="ni">💬</span>Auto Reply</button>
+      <button class="nav-btn" onclick="goTo('scheduled',this)"><span class="ni">📅</span>Scheduled Msgs</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">System</div>
+      <button class="nav-btn" onclick="goTo('danger',this)"><span class="ni">⚠️</span>Danger Zone</button>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="owner-row">
+      <div class="owner-av"><img src="https://files.catbox.moe/qhrzt2.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:7px;"></div>
+      <div class="owner-info">
+        <div class="owner-num" id="sb-num">—</div>
+        <div class="owner-loc">🇱🇰 Bot Owner</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">↩ Logout</button>
+    <div class="made-by">made by <span>nimeshka mihiran</span></div>
+  </div>
+</aside>
+
+<button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<main class="main">
+  <div class="page-top">
+    <div>
+      <div class="page-title">Bot <span>Settings</span></div>
+      <div class="page-sub" id="page-sub-num">Mezuka MD Mini Bot — live settings panel</div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-ghost btn-sm" onclick="discardChanges()">↺ Discard</button>
+      <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save All</button>
+    </div>
+  </div>
+
+  <div id="main-loading" class="loading-row"><div class="spinner"></div>&nbsp;Loading settings from server...</div>
+
+  <div class="settings-grid" id="settings-grid" style="display:none">
+
+    <!-- GENERAL -->
+    <div class="section" id="general">
+      <div class="section-hd"><div class="section-icon si-green">⚙️</div><div class="section-title">General</div><div class="section-line"></div></div>
+      <div class="card">
+        <div class="sr"><div class="sr-ico si-blue">🤖</div><div class="sr-info"><div class="sr-label">Bot Name</div><div class="sr-key">BOT_NAME</div></div><div class="sr-ctrl"><input class="inp" id="BOT_NAME" placeholder="Mezuka Md" oninput="dirty()"></div></div>
+        <div class="sr"><div class="sr-ico si-green">👤</div><div class="sr-info"><div class="sr-label">Owner Name</div><div class="sr-key">OWNER_NAME</div></div><div class="sr-ctrl"><input class="inp" id="OWNER_NAME" oninput="dirty()"></div></div>
+        <div class="sr"><div class="sr-ico si-blue">🌍</div><div class="sr-info"><div class="sr-label">Owner Country</div><div class="sr-key">OWNER_FROM</div></div><div class="sr-ctrl"><input class="inp" id="OWNER_FROM" oninput="dirty()"></div></div>
+        <div class="sr"><div class="sr-ico si-yellow">🎂</div><div class="sr-info"><div class="sr-label">Owner Age</div><div class="sr-key">OWNER_AGE</div></div><div class="sr-ctrl"><input class="inp" id="OWNER_AGE" style="width:80px" oninput="dirty()"></div></div>
+        <div class="sr"><div class="sr-ico si-green">⌨️</div><div class="sr-info"><div class="sr-label">Command Prefix</div><div class="sr-key">PRIFIX</div></div><div class="sr-ctrl"><input class="inp inp-mono" id="PRIFIX" style="width:65px" oninput="dirty()"></div></div>
+        <div class="sr"><div class="sr-ico si-blue">🌐</div><div class="sr-info"><div class="sr-label">Bot Mode</div><div class="sr-key">MODE</div></div><div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="MODE" onchange="dirty()"><option value="Public">Public</option><option value="Private">Private</option><option value="Inbox">Inbox</option><option value="Group">Group</option></select></div></div></div>
+        <div class="sr"><div class="sr-ico si-purple">🗣️</div><div class="sr-info"><div class="sr-label">Bot Language</div><div class="sr-key">NENO_LAN</div></div><div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="NENO_LAN" onchange="dirty()"><option value="EN">English</option><option value="SI">Sinhala</option><option value="TA">Tamil</option><option value="JP">Japanese</option></select></div></div></div>
+        <div class="sr"><div class="sr-ico si-green">🔘</div><div class="sr-info"><div class="sr-label">Button Messages</div><div class="sr-key">BUTTON</div></div><div class="sr-ctrl"><div class="toggle" id="tog_BUTTON" onclick="toggleSwitch(this,'BUTTON')"></div></div></div>
+      </div>
+    </div>
+
+    <!-- AUTO FEATURES -->
+    <div class="section" id="auto">
+      <div class="section-hd"><div class="section-icon si-blue">🤖</div><div class="section-title">Auto Features</div><div class="section-line"></div></div>
+      <div class="card">
+        <div class="sr"><div class="sr-ico si-green">😄</div><div class="sr-info"><div class="sr-label">Auto React Status</div><div class="sr-key">AUTO_REACT_STATUS</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_REACT_STATUS" onclick="toggleSwitch(this)"></div></div></div>
+        <div class="sr"><div class="sr-ico si-blue">✍️</div><div class="sr-info"><div class="sr-label">Auto Typing</div><div class="sr-key">AUTO_TYPING</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_TYPING" onclick="toggleSwitch(this,'AUTO_TYPING')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-purple">🎙️</div><div class="sr-info"><div class="sr-label">Auto Recording</div><div class="sr-key">AUTO_RECODING</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_RECODING" onclick="toggleSwitch(this,'AUTO_RECODING')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-green">🟢</div><div class="sr-info"><div class="sr-label">Always Online</div><div class="sr-key">ALWAYS_ONLINE</div></div><div class="sr-ctrl"><div class="toggle" id="tog_ALWAYS_ONLINE" onclick="toggleSwitch(this,'ALWAYS_ONLINE')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-blue">📖</div><div class="sr-info"><div class="sr-label">Auto Read Status</div><div class="sr-key">AUTO_READ_STATUS</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_READ_STATUS" onclick="toggleSwitch(this,'AUTO_READ_STATUS')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-yellow">📨</div><div class="sr-info"><div class="sr-label">Auto Read Messages</div><div class="sr-key">AUTO_READ_MSG</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_READ_MSG" onclick="toggleSwitch(this,'AUTO_READ_MSG')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-green">💾</div><div class="sr-info"><div class="sr-label">Auto Save Contacts</div><div class="sr-key">AUTO_SAVE</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_SAVE" onclick="toggleSwitch(this,'AUTO_SAVE')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-purple">👁️</div><div class="sr-info"><div class="sr-label">CMD Read Receipt</div><div class="sr-key">CMD_READ</div></div><div class="sr-ctrl"><div class="toggle" id="tog_CMD_READ" onclick="toggleSwitch(this,'CMD_READ')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-blue">🎵</div><div class="sr-info"><div class="sr-label">Auto Voice</div><div class="sr-key">AUTO_VOICE</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_VOICE" onclick="toggleSwitch(this,'AUTO_VOICE')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-red">🚫</div><div class="sr-info"><div class="sr-label">Auto Block</div><div class="sr-key">AUTO_BLOCK</div></div><div class="sr-ctrl"><div class="toggle" id="tog_AUTO_BLOCK" onclick="toggleSwitch(this,'AUTO_BLOCK')"></div></div></div>
+        <div class="sr"><div class="sr-ico si-red">🗑️</div><div class="sr-info"><div class="sr-label">Anti Delete</div><div class="sr-key">ANTI_DELETE</div></div><div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="ANTI_DELETE" onchange="dirty()"><option value="false">Off</option><option value="from">From (Sender)</option><option value="true">All Messages</option></select></div></div></div>
+        <div class="sr"><div class="sr-ico si-red">📂</div><div class="sr-info"><div class="sr-label">Anti Delete Work Type</div><div class="sr-key">ANTI_DELETE_WORK_TYPE</div></div><div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="ANTI_DELETE_WORK_TYPE" onchange="dirty()"><option value="both">Both (Inbox + Group)</option><option value="inbox">Inbox Only</option><option value="group">Group Only</option></select></div></div></div>
+        <div class="sr"><div class="sr-ico si-red">📤</div><div class="sr-info"><div class="sr-label">Anti Delete Send Type</div><div class="sr-key">ANTI_DELETE_SEND_TYPE</div></div><div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="ANTI_DELETE_SEND_TYPE" onchange="dirty()"><option value="inbox">Inbox (Owner)</option><option value="del chat">Del Chat (Same Chat)</option></select></div></div></div>
+        <div class="sr"><div class="sr-ico si-red">📵</div><div class="sr-info"><div class="sr-label">Anti Call</div><div class="sr-key">ANTI_CALL</div></div><div class="sr-ctrl"><div class="toggle" id="tog_ANTI_CALL" onclick="toggleSwitch(this,'ANTI_CALL')"></div></div></div>
+      </div>
+    </div>
+
+    <!-- MEDIA & LINKS -->
+    <div class="section" id="media">
+      <div class="section-hd"><div class="section-icon si-yellow">🖼️</div><div class="section-title">Media & Links</div><div class="section-line"></div></div>
+      <div class="card">
+        <div class="sr"><div class="sr-ico si-yellow">👤</div><div class="sr-info"><div class="sr-label">Owner Image URL</div><div class="sr-key">OWNER_IMG</div></div><div class="sr-ctrl" style="gap:8px"><img class="img-preview" id="prev_OWNER_IMG" src="" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect fill=%22%23ffffff15%22 width=%2238%22 height=%2238%22 rx=%2210%22/><text x=%2219%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2216%22>🖼</text></svg>'"><input class="inp inp-mono" id="OWNER_IMG" oninput="dirty();updatePrev('OWNER_IMG')"></div></div>
+        <div class="sr"><div class="sr-ico si-blue">📋</div><div class="sr-info"><div class="sr-label">Menu Logo URL</div><div class="sr-key">MENU_LOGO</div></div><div class="sr-ctrl" style="gap:8px"><img class="img-preview" id="prev_MENU_LOGO" src="" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect fill=%22%23ffffff15%22 width=%2238%22 height=%2238%22 rx=%2210%22/><text x=%2219%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2216%22>🖼</text></svg>'"><input class="inp inp-mono" id="MENU_LOGO" oninput="dirty();updatePrev('MENU_LOGO')"></div></div>
+        <div class="sr"><div class="sr-ico si-green">💚</div><div class="sr-info"><div class="sr-label">Alive Logo URL</div><div class="sr-key">ALIVE_LOGO</div></div><div class="sr-ctrl" style="gap:8px"><img class="img-preview" id="prev_ALIVE_LOGO" src="" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect fill=%22%23ffffff15%22 width=%2238%22 height=%2238%22 rx=%2210%22/><text x=%2219%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2216%22>🖼</text></svg>'"><input class="inp inp-mono" id="ALIVE_LOGO" oninput="dirty();updatePrev('ALIVE_LOGO')"></div></div>
+
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="section" id="msg">
+      <div class="section-hd"><div class="section-icon si-purple">💬</div><div class="section-title">Messages</div><div class="section-line"></div></div>
+      <div class="card">
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-green" style="margin-top:2px">✨</div>
+          <div class="sr-info"><div class="sr-label">Alive Message</div><div class="sr-key">ALIVE_MSG</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:300px"><textarea class="list-area" id="ALIVE_MSG" rows="2" oninput="dirty()"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESS CONTROL -->
+    <div class="section" id="access">
+      <div class="section-hd"><div class="section-icon si-red">🔐</div><div class="section-title">Access Control</div><div class="section-line"></div></div>
+      <div class="card">
+        <div class="sr" style="align-items:flex-start"><div class="sr-ico si-blue" style="margin-top:2px">👑</div><div class="sr-info"><div class="sr-label">Sudo Numbers</div><div class="sr-key">SUDO — comma separated</div></div><div class="sr-ctrl" style="flex:1;max-width:300px"><textarea class="list-area inp-mono" id="SUDO" rows="3" placeholder="94712345678,94712345679,..." oninput="dirty()"></textarea></div></div>
+        <div class="sr" style="align-items:flex-start"><div class="sr-ico si-red" style="margin-top:2px">🚫</div><div class="sr-info"><div class="sr-label">Banned Numbers</div><div class="sr-key">BAN — comma separated</div></div><div class="sr-ctrl" style="flex:1;max-width:300px"><textarea class="list-area inp-mono" id="BAN" rows="3" placeholder="94712345678,..." oninput="dirty()"></textarea></div></div>
+        <div class="sr" style="align-items:flex-start"><div class="sr-ico si-green" style="margin-top:2px">✅</div><div class="sr-info"><div class="sr-label">Call Open List</div><div class="sr-key">CALL_OPEN_LIST</div></div><div class="sr-ctrl" style="flex:1;max-width:300px"><textarea class="list-area inp-mono" id="CALL_OPEN_LIST" rows="2" placeholder="Numbers that can call..." oninput="dirty()"></textarea></div></div>
+        <div class="sr" style="align-items:flex-start"><div class="sr-ico si-red" style="margin-top:2px">❌</div><div class="sr-info"><div class="sr-label">Call Reject List</div><div class="sr-key">CALL_REJECT_LIST</div></div><div class="sr-ctrl" style="flex:1;max-width:300px"><textarea class="list-area inp-mono" id="CALL_REJECT_LIST" rows="2" placeholder="Numbers to reject..." oninput="dirty()"></textarea></div></div>
+      </div>
+    </div>
+
+    <!-- AUTO REPLY -->
+    <div class="section" id="autoreply">
+      <div class="section-hd">
+        <div class="section-icon si-green">💬</div>
+        <div class="section-title">Auto Reply</div>
+        <div class="section-line"></div>
+        <span class="count-chip" id="ar-chip">0/20</span>
+      </div>
+      <div class="sys-row">
+        <div class="sys-row-info"><strong>Auto Reply System</strong><small>Enable / disable all auto replies at once</small></div>
+        <div class="toggle" id="tog_AR" onclick="toggleAR(this)"></div>
+      </div>
+      <div class="add-form">
+        <div class="afc" style="max-width:180px"><label>Trigger Word</label><input type="text" id="ar-trigger" placeholder="e.g. hello, price"></div>
+        <div class="afc"><label>Response Message</label><textarea id="ar-response" rows="2" placeholder="Enter the reply message..."></textarea></div>
+        <button class="btn btn-primary" style="align-self:flex-end;white-space:nowrap" onclick="addAR()">+ Add Reply</button>
+      </div>
+      <div class="card" id="ar-card"><div class="loading-row"><div class="spinner"></div>&nbsp;Loading...</div></div>
+    </div>
+
+    <!-- SCHEDULED -->
+    <div class="section" id="scheduled">
+      <div class="section-hd">
+        <div class="section-icon si-blue">📅</div>
+        <div class="section-title">Scheduled Messages</div>
+        <div class="section-line"></div>
+        <span class="count-chip" id="sch-chip">0/20</span>
+      </div>
+      <div class="sys-row">
+        <div class="sys-row-info"><strong>Scheduled Messages System</strong><small>Enable / disable all scheduled messages at once</small></div>
+        <div class="toggle" id="tog_SCH" onclick="toggleSCH(this)"></div>
+      </div>
+      <div class="add-form">
+        <div class="afc" style="max-width:160px"><label>Recipient Number</label><input type="tel" id="sch-num" placeholder="94712345678"></div>
+        <div class="afc" style="max-width:130px"><label>Name (optional)</label><input type="text" id="sch-name" placeholder="e.g. John"></div>
+        <div class="afc" style="max-width:128px"><label>Day</label><select id="sch-day"><option value="everyday">Everyday</option><option value="monday">Monday</option><option value="tuesday">Tuesday</option><option value="wednesday">Wednesday</option><option value="thursday">Thursday</option><option value="friday">Friday</option><option value="saturday">Saturday</option><option value="sunday">Sunday</option></select></div>
+        <div class="afc" style="max-width:110px"><label>Time (24h)</label><input type="time" id="sch-time"></div>
+        <div class="afc"><label>Message</label><textarea id="sch-msg" rows="2" placeholder="Good morning! 😊"></textarea></div>
+        <button class="btn btn-primary" style="align-self:flex-end;white-space:nowrap" onclick="addSCH()">+ Schedule</button>
+      </div>
+      <div id="sch-cont"><div class="loading-row"><div class="spinner"></div>&nbsp;Loading...</div></div>
+    </div>
+
+    <!-- ANTI LINK -->
+    <div class="section" id="antilink">
+      <div class="section-hd"><div class="section-icon si-red">🔗</div><div class="section-title">Anti Link</div><div class="section-line"></div></div>
+      <div class="sys-row">
+        <div class="sys-row-info"><strong>Anti Link System</strong><small>Group links detect කරලා automatic action ගනී</small></div>
+        <div class="toggle" id="tog_ANTI_LINK" onclick="toggleGrp('ANTI_LINK',this)"></div>
+      </div>
+      <div class="card">
+        <div class="sr">
+          <div class="sr-ico si-red">⚡</div>
+          <div class="sr-info"><div class="sr-label">Action When Link Found</div><div class="sr-key">ANTI_LINK_ACTION</div></div>
+          <div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="ANTI_LINK_ACTION" onchange="grpDirty()"><option value="warn">⚠️ Warn Only</option><option value="kick">🚫 Kick Member</option><option value="delete">🗑️ Delete Only</option></select></div></div>
+        </div>
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-yellow" style="margin-top:2px">💬</div>
+          <div class="sr-info"><div class="sr-label">Warning Message</div><div class="sr-key">ANTI_LINK_MSG — @user = mention</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:320px"><textarea class="list-area" id="ANTI_LINK_MSG" rows="2" placeholder="⚠️ Links are not allowed in this group!" oninput="grpDirty()"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANTI BAD WORD -->
+    <div class="section" id="antibad">
+      <div class="section-hd"><div class="section-icon si-red">🤬</div><div class="section-title">Anti Bad Word</div><div class="section-line"></div></div>
+      <div class="sys-row">
+        <div class="sys-row-info"><strong>Anti Bad Word System</strong><small>Bad words detect කරලා automatic action ගනී</small></div>
+        <div class="toggle" id="tog_ANTI_BAD" onclick="toggleGrp('ANTI_BAD',this)"></div>
+      </div>
+      <div class="card">
+        <div class="sr">
+          <div class="sr-ico si-red">⚡</div>
+          <div class="sr-info"><div class="sr-label">Action When Bad Word Found</div><div class="sr-key">ANTI_BAD_ACTION</div></div>
+          <div class="sr-ctrl"><div class="sel-wrap"><select class="sel" id="ANTI_BAD_ACTION" onchange="grpDirty()"><option value="warn">⚠️ Warn Only</option><option value="kick">🚫 Kick Member</option><option value="delete">🗑️ Delete Only</option></select></div></div>
+        </div>
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-yellow" style="margin-top:2px">💬</div>
+          <div class="sr-info"><div class="sr-label">Warning Message</div><div class="sr-key">ANTI_BAD_MSG — @user = mention</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:320px"><textarea class="list-area" id="ANTI_BAD_MSG" rows="2" placeholder="⚠️ Bad words are not allowed!" oninput="grpDirty()"></textarea></div>
+        </div>
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-red" style="margin-top:2px">🚫</div>
+          <div class="sr-info"><div class="sr-label">Bad Words List</div><div class="sr-key">BAD_WORDS — comma separated, case insensitive</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:320px"><textarea class="list-area inp-mono" id="BAD_WORDS" rows="3" placeholder="word1,word2,word3,..." oninput="grpDirty()"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WELCOME / GOODBYE -->
+    <div class="section" id="greetings">
+      <div class="section-hd"><div class="section-icon si-green">👋</div><div class="section-title">Welcome / Goodbye</div><div class="section-line"></div></div>
+      <div class="card">
+        <!-- WELCOME -->
+        <div class="sr">
+          <div class="sr-ico si-green">🌸</div>
+          <div class="sr-info"><div class="sr-label">Welcome Message</div><div class="sr-key">WELCOME — Enable when member joins</div></div>
+          <div class="sr-ctrl"><div class="toggle" id="tog_WELCOME" onclick="toggleGrp('WELCOME',this)"></div></div>
+        </div>
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-green" style="margin-top:2px">💬</div>
+          <div class="sr-info"><div class="sr-label">Welcome Text</div><div class="sr-key">WELCOME_MSG — @user = mention, @name = number</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:320px"><textarea class="list-area" id="WELCOME_MSG" rows="3" placeholder="🌸 Welcome to the group, @user! 🎉" oninput="grpDirty()"></textarea></div>
+        </div>
+        <!-- GOODBYE -->
+        <div class="sr" style="border-top:1px solid rgba(78,205,196,0.12)">
+          <div class="sr-ico si-yellow">👋</div>
+          <div class="sr-info"><div class="sr-label">Goodbye Message</div><div class="sr-key">GOODBYE — Enable when member leaves</div></div>
+          <div class="sr-ctrl"><div class="toggle" id="tog_GOODBYE" onclick="toggleGrp('GOODBYE',this)"></div></div>
+        </div>
+        <div class="sr" style="align-items:flex-start">
+          <div class="sr-ico si-yellow" style="margin-top:2px">💬</div>
+          <div class="sr-info"><div class="sr-label">Goodbye Text</div><div class="sr-key">GOODBYE_MSG — @user = mention</div></div>
+          <div class="sr-ctrl" style="flex:1;max-width:320px"><textarea class="list-area" id="GOODBYE_MSG" rows="3" placeholder="👋 Goodbye @user! We'll miss you." oninput="grpDirty()"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGER -->
+    <div class="section" id="danger">
+      <div class="section-hd"><div class="section-icon si-red">⚠️</div><div class="section-title">Danger Zone</div><div class="section-line"></div></div>
+      <div class="card" style="border-color:rgba(255,69,58,0.25)">
+        <div class="sr"><div class="sr-ico si-red">🔄</div><div class="sr-info"><div class="sr-label">Reset to Defaults</div><div class="sr-key">All settings will return to database.js defaults</div></div><div class="sr-ctrl"><button class="btn btn-danger btn-sm" onclick="resetAll()">Reset All</button></div></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar" id="saveBar">
+  <div class="sb-indicator"></div>
+  <div class="sb-text"><strong>Unsaved Changes</strong><small>Settings not saved to server yet</small></div>
+  <button class="btn btn-ghost btn-sm" onclick="discardChanges()">↺ Discard</button>
+  <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastIcon">✅</span>&nbsp;<span id="toastMsg"></span></div>
+
+<!-- STARTUP NOTIFICATION -->
+<div class="startup-notif" id="startupNotif">
+  <div class="sn-icon"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+  <div class="sn-body">
+    <div class="sn-title">made by nimeshka mihiran</div>
+    <div class="sn-msg">rest in peace tharidu gimhana 🕊️</div>
+    <div class="sn-time">just now</div>
+  </div>
+  <button class="sn-close" onclick="document.getElementById('startupNotif').classList.remove('show')">✕</button>
+</div>
+
+<script>
+const DEFAULTS={BOT_NAME:"Mezuka Md",OWNER_NAME:"𝐌ᴇᴢᴜᴋᴀ 𝐌ᴅ 𝐌ɪɴɪ 𝐁ᴏᴛ",OWNER_FROM:"Sri Lanka",BUTTON:"true",OWNER_AGE:"+20",PRIFIX:".",MODE:"Public",NENO_LAN:"EN",AUTO_REACT_STATUS:"true",ANTI_DELETE:"from",ANTI_DELETE_WORK_TYPE:"both",ANTI_DELETE_SEND_TYPE:"inbox",ANTI_CALL:"false",CALL_REJECT_LIST:"",CALL_OPEN_LIST:"",AUTO_TYPING:"false",AUTO_RECODING:"false",ALWAYS_ONLINE:"false",AUTO_READ_STATUS:"true",AUTO_READ_MSG:"false",AUTO_SAVE:"false",CMD_READ:"false",AUTO_VOICE:"false",AUTO_BLOCK:"false",OWNER_IMG:"https://files.catbox.moe/aeeo1i.jpg",MENU_LOGO:"https://files.catbox.moe/aeeo1i.jpg",ALIVE_LOGO:"https://files.catbox.moe/aeeo1i.jpg",ALIVE_MSG:"©ᴘᴏᴡᴇʀᴇᴅ ʙʏ ʙʟᴀᴄᴋ ᴄᴀᴛ ᴏꜰᴄ",BAN:"",SUDO:""};
+const TK=['BOT_NAME','OWNER_NAME','OWNER_FROM','OWNER_AGE','PRIFIX','OWNER_IMG','MENU_LOGO','ALIVE_LOGO','ALIVE_MSG','SUDO','BAN','CALL_OPEN_LIST','CALL_REJECT_LIST'];
+const SK=['MODE','NENO_LAN','ANTI_DELETE','ANTI_DELETE_WORK_TYPE','ANTI_DELETE_SEND_TYPE'];
+const BK=['BUTTON','AUTO_REACT_STATUS','AUTO_TYPING','AUTO_RECODING','ALWAYS_ONLINE','AUTO_READ_STATUS','AUTO_READ_MSG','AUTO_SAVE','CMD_READ','AUTO_VOICE','AUTO_BLOCK','ANTI_CALL'];
+const IK=['OWNER_IMG','MENU_LOGO','ALIVE_LOGO'];
+const DAY_L={everyday:'🔄 Everyday',monday:'Mon',tuesday:'Tue',wednesday:'Wed',thursday:'Thu',friday:'Fri',saturday:'Sat',sunday:'Sun'};
+
+let AUTH={number:'',password:''};
+let isDirty=false;
+let _saved={...DEFAULTS};
+
+// ─ LOGIN ─
+async function doLogin(){
+  const num=document.getElementById('l-num').value.trim();
+  const pass=document.getElementById('l-pass').value.trim();
+  const err=document.getElementById('login-err');
+  err.style.display='none';
+  if(!num||!pass){err.textContent='Please fill in both fields';err.style.display='block';return;}
+  try{
+    const r=await post('/api/settings/login',{number:num,password:pass});
+    if(!r.ok){err.textContent=r.error||'Invalid number or password';err.style.display='block';return;}
+    AUTH={number:r.number,password:pass.toUpperCase()};
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-wrap').style.display='flex';
+    document.getElementById('sb-num').textContent=AUTH.number;
+    document.getElementById('page-sub-num').textContent='Mezuka MD Mini Bot · '+AUTH.number;
+    await loadFromServer();
+    loadAR();
+    loadSCH();
+    loadGrp();
+  }catch(e){err.textContent='Connection error: '+e.message;err.style.display='block';}
+}
+function doLogout(){
+  AUTH={number:'',password:''};
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-wrap').style.display='none';
+  document.getElementById('l-pass').value='';
+  document.getElementById('settings-grid').style.display='none';
+  document.getElementById('main-loading').style.display='flex';
+}
+document.getElementById('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ─ GROUP SETTINGS ─
+const GK_TOGGLE = ['ANTI_LINK','ANTI_BAD','WELCOME','GOODBYE'];
+const GK_SEL    = ['ANTI_LINK_ACTION','ANTI_BAD_ACTION'];
+const GK_TEXT   = ['ANTI_LINK_MSG','ANTI_BAD_MSG','BAD_WORDS','WELCOME_MSG','GOODBYE_MSG'];
+let _grpSaved = {};
+
+async function loadGrp(){
+  try{
+    const r = await post('/api/group/get', AUTH);
+    if(r.ok && r.settings){
+      _grpSaved = {...r.settings};
+      applyGrpUI(_grpSaved);
+    }
+  }catch(e){ console.log('group load error',e); }
+}
+
+function applyGrpUI(s){
+  GK_TOGGLE.forEach(k=>{ const t=document.getElementById('tog_'+k); if(t) t.classList.toggle('on', s[k]==='true'); });
+  GK_SEL.forEach(k=>{ const e=document.getElementById(k); if(e) e.value = s[k] || 'warn'; });
+  GK_TEXT.forEach(k=>{ const e=document.getElementById(k); if(e) e.value = s[k] || ''; });
+}
+
+function grpDirty(){ if(!isDirty){ isDirty=true; document.getElementById('saveBar').classList.add('visible'); } }
+
+function toggleGrp(key, el){
+  el.classList.toggle('on');
+  const val = el.classList.contains('on') ? 'true' : 'false';
+  post('/api/group/update', {...AUTH, key, value: val})
+    .then(r=>{
+      if(r.ok){ showToast('✅', key + ' ' + (val==='true'?'ON':'OFF')); _grpSaved[key]=val; }
+      else{ el.classList.toggle('on'); showToast('❌', r.error||'Failed'); }
+    });
+}
+
+async function saveGrp(){
+  const changes=[];
+  GK_SEL.forEach(k=>{ const e=document.getElementById(k); if(e && e.value !== (_grpSaved[k]||'warn')) changes.push({key:k,value:e.value}); });
+  GK_TEXT.forEach(k=>{ const e=document.getElementById(k); if(e && e.value !== (_grpSaved[k]||'')) changes.push({key:k,value:e.value}); });
+  for(const {key,value} of changes){
+    const r = await post('/api/group/update', {...AUTH, key, value});
+    if(r.ok) _grpSaved[key]=value;
+  }
+}
+
+// ─ API ─
+async function post(url,body){
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+
+// ─ LOAD ─
+async function loadFromServer(){
+  try{
+    const r=await post('/api/settings/get',AUTH);
+    if(r.ok&&r.settings){
+      _saved={...DEFAULTS,...r.settings};
+      applyUI(_saved);
+      document.getElementById('main-loading').style.display='none';
+      document.getElementById('settings-grid').style.display='flex';
+    }else showToast('❌','Failed to load settings');
+  }catch(e){showToast('❌','Server error');}
+}
+
+function applyUI(s){
+  TK.forEach(k=>{const e=document.getElementById(k);if(e)e.value=s[k]??'';});
+  SK.forEach(k=>{const e=document.getElementById(k);if(e)e.value=s[k]??'';});
+  BK.forEach(k=>{const t=document.getElementById('tog_'+k);if(t)t.classList.toggle('on',s[k]==='true');});
+  IK.forEach(k=>{const p=document.getElementById('prev_'+k);if(p&&s[k])p.src=s[k];});
+}
+
+function collect(){
+  const s={};
+  TK.forEach(k=>{const e=document.getElementById(k);if(e)s[k]=e.value;});
+  SK.forEach(k=>{const e=document.getElementById(k);if(e)s[k]=e.value;});
+  BK.forEach(k=>{const t=document.getElementById('tog_'+k);if(t)s[k]=t.classList.contains('on')?'true':'false';});
+  return s;
+}
+
+async function saveAll(){
+  const cur=collect();
+  const changes=[];
+  for(const k of [...TK,...SK,...BK]){if(cur[k]!==_saved[k])changes.push({key:k,value:cur[k]});}
+  
+  // Group settings changes
+  const grpChanges=[];
+  GK_SEL.forEach(k=>{ const e=document.getElementById(k); if(e && e.value!==(_grpSaved[k]||'warn')) grpChanges.push({key:k,value:e.value}); });
+  GK_TEXT.forEach(k=>{ const e=document.getElementById(k); if(e && e.value!==(_grpSaved[k]||'')) grpChanges.push({key:k,value:e.value}); });
+
+  const totalChanges = changes.length + grpChanges.length;
+  if(!totalChanges){showToast('ℹ️','No changes to save');return;}
+  showToast('💾',`Saving ${totalChanges} change(s)...`);
+  let ok=0,fail=0;
+  for(const{key,value}of changes){
+    try{const r=await post('/api/settings/update',{...AUTH,key,value});if(r.ok){ok++;_saved[key]=value;}else fail++;}
+    catch(e){fail++;}
+  }
+  for(const{key,value}of grpChanges){
+    try{const r=await post('/api/group/update',{...AUTH,key,value});if(r.ok){ok++;_grpSaved[key]=value;}else fail++;}
+    catch(e){fail++;}
+  }
+  isDirty=false;document.getElementById('saveBar').classList.remove('visible');
+  showToast(fail===0?'✅':'⚠️',fail===0?`${ok} setting(s) saved!`:`${ok} saved, ${fail} failed`);
+}
+
+function dirty(){if(!isDirty){isDirty=true;document.getElementById('saveBar').classList.add('visible');}}
+function toggleSwitch(el){el.classList.toggle('on');dirty();}
+function updatePrev(k){const v=document.getElementById(k).value;const p=document.getElementById('prev_'+k);if(p)p.src=v;}
+
+async function discardChanges(){
+  const r=await post('/api/settings/get',AUTH);
+  if(r.ok&&r.settings){_saved={...DEFAULTS,...r.settings};applyUI(_saved);}
+  await loadGrp();
+  isDirty=false;document.getElementById('saveBar').classList.remove('visible');showToast('↺','Changes discarded');
+}
+
+async function resetAll(){
+  if(!confirm('Reset all settings to defaults?'))return;
+  for(const[k,v]of Object.entries(DEFAULTS))await post('/api/settings/update',{...AUTH,key:k,value:v}).catch(()=>{});
+  _saved={...DEFAULTS};applyUI(_saved);isDirty=false;document.getElementById('saveBar').classList.remove('visible');
+  showToast('🔄','Reset to defaults');
+}
+
+// ─ AUTO REPLY ─
+async function loadAR(){
+  document.getElementById('ar-card').innerHTML='<div class="loading-row"><div class="spinner"></div>&nbsp;Loading...</div>';
+  try{
+    const r=await post('/api/autoreply/list',AUTH);
+    if(!r.ok){document.getElementById('ar-card').innerHTML='<div class="empty-state"><div class="ei">❌</div>Failed to load</div>';return;}
+    document.getElementById('tog_AR').classList.toggle('on',r.enabled!==false);
+    renderAR(r.replies||[]);
+  }catch(e){document.getElementById('ar-card').innerHTML='<div class="empty-state">Connection error</div>';}
+}
+function renderAR(replies){
+  document.getElementById('ar-chip').textContent=replies.length+'/20';
+  const c=document.getElementById('ar-card');
+  if(!replies.length){c.innerHTML='<div class="empty-state"><div class="ei">💬</div>No auto replies yet. Add one above.</div>';return;}
+  c.innerHTML=replies.map(r=>`<div class="ar-item"><div class="ar-item-ico">💬</div><div class="ar-item-body"><div class="ar-tag">${esc(r.trigger)}</div><div class="ar-txt">${esc(r.response)}</div></div><button class="btn btn-danger btn-sm" onclick="deleteAR('${esc(r.trigger)}')">🗑 Delete</button></div>`).join('');
+}
+async function addAR(){
+  const trigger=document.getElementById('ar-trigger').value.trim();
+  const response=document.getElementById('ar-response').value.trim();
+  if(!trigger||!response){showToast('⚠️','Trigger and response required');return;}
+  const r=await post('/api/autoreply/add',{...AUTH,trigger,response});
+  if(r.ok){showToast('✅','Auto reply added');document.getElementById('ar-trigger').value='';document.getElementById('ar-response').value='';loadAR();}
+  else showToast('❌',r.error||'Failed');
+}
+async function deleteAR(trigger){
+  if(!confirm('Delete trigger "'+trigger+'"?'))return;
+  const r=await post('/api/autoreply/delete',{...AUTH,trigger});
+  if(r.ok){showToast('✅','Deleted');loadAR();}else showToast('❌',r.error||'Failed');
+}
+async function toggleAR(el){
+  el.classList.toggle('on');const enabled=el.classList.contains('on');
+  const r=await post('/api/autoreply/toggle',{...AUTH,enabled});
+  if(r.ok)showToast('✅','Auto reply '+(enabled?'ON':'OFF'));
+  else{el.classList.toggle('on');showToast('❌',r.error||'Failed');}
+}
+
+// ─ SCHEDULED ─
+async function loadSCH(){
+  document.getElementById('sch-cont').innerHTML='<div class="loading-row"><div class="spinner"></div>&nbsp;Loading...</div>';
+  try{
+    const r=await post('/api/scheduled/list',AUTH);
+    if(!r.ok){document.getElementById('sch-cont').innerHTML='<div class="empty-state"><div class="ei">❌</div>Failed to load</div>';return;}
+    document.getElementById('tog_SCH').classList.toggle('on',r.enabled!==false);
+    renderSCH(r.messages||[]);
+  }catch(e){document.getElementById('sch-cont').innerHTML='<div class="empty-state">Connection error</div>';}
+}
+function renderSCH(msgs){
+  document.getElementById('sch-chip').textContent=msgs.length+'/20';
+  const el=document.getElementById('sch-cont');
+  if(!msgs.length){el.innerHTML='<div class="empty-state"><div class="ei">📅</div>No scheduled messages yet. Add one above.</div>';return;}
+  el.innerHTML='<div class="sch-grid">'+msgs.map(m=>`<div class="sch-card"><div class="sch-card-head"><div><div class="sch-to-name">${m.recipientName?esc(m.recipientName):'—'}</div><div class="sch-to-num">${esc(m.recipientNumber)}</div></div><div class="sch-day-tag">${DAY_L[m.day]||m.day} · ${m.time}</div></div><div class="sch-msg">${esc(m.message)}</div><div class="sch-footer"><div class="sch-last">${m.lastSent?'✓ '+new Date(m.lastSent).toLocaleDateString():'Not sent yet'}</div><button class="btn btn-danger btn-sm" onclick="deleteSCH('${m.id}')">🗑 Delete</button></div></div>`).join('')+'</div>';
+}
+async function addSCH(){
+  const recipientNumber=document.getElementById('sch-num').value.trim();
+  const recipientName=document.getElementById('sch-name').value.trim();
+  const day=document.getElementById('sch-day').value;
+  const time=document.getElementById('sch-time').value;
+  const message=document.getElementById('sch-msg').value.trim();
+  if(!recipientNumber||!time||!message){showToast('⚠️','Number, time & message required');return;}
+  const r=await post('/api/scheduled/add',{...AUTH,recipientNumber,recipientName,day,time,message});
+  if(r.ok){showToast('✅','Scheduled!');document.getElementById('sch-num').value='';document.getElementById('sch-name').value='';document.getElementById('sch-msg').value='';loadSCH();}
+  else showToast('❌',r.error||'Failed');
+}
+async function deleteSCH(id){
+  if(!confirm('Delete this schedule?'))return;
+  const r=await post('/api/scheduled/delete',{...AUTH,id});
+  if(r.ok){showToast('✅','Deleted');loadSCH();}else showToast('❌',r.error||'Failed');
+}
+async function toggleSCH(el){
+  el.classList.toggle('on');const enabled=el.classList.contains('on');
+  const r=await post('/api/scheduled/toggle',{...AUTH,enabled});
+  if(r.ok)showToast('✅','Scheduled msgs '+(enabled?'ON':'OFF'));
+  else{el.classList.toggle('on');showToast('❌',r.error||'Failed');}
+}
+
+// ─ UTILS ─
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(icon,msg){
+  document.getElementById('toastIcon').textContent=icon;
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function goTo(id,btn){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+const SECS=['general','auto','media','msg','access','antilink','antibad','greetings','autoreply','scheduled','danger'];
+window.addEventListener('scroll',()=>{
+  let cur='';
+  SECS.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-120)cur=id;});
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    const t=b.getAttribute('onclick')||'';
+    b.classList.toggle('active',t.includes("'"+cur+"'"));
+  });
+});
+// ─ STARTUP NOTIFICATION ─
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('startupNotif').classList.add('show');
+    setTimeout(()=>{
+      document.getElementById('startupNotif').classList.remove('show');
+    }, 5500);
+  }, 800);
+});
+</script>
+</body>
+</html>

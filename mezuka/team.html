@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mezuka MD V4 | Admin Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#4ecdc4;
+  --teal-d:#2bb5ab;
+  --teal-dd:#1a8f87;
+  --teal-l:#7eddd7;
+  --teal-xl:#b2ebe8;
+  --teal-bg:#e8faf9;
+  --teal-bg2:#f0fdfc;
+  --pink:#ff6b9d;
+  --white:#fff;
+  --dark:#1a2e2e;
+  --dark2:#2a3d3d;
+  --gray:#6b8080;
+  --gray-l:#a0b8b8;
+  --card-s:0 4px 24px rgba(78,205,196,0.13);
+  --card-sh:0 12px 40px rgba(78,205,196,0.25);
+  --green:#2ecc71;
+  --purple:#a78bfa;
+  --blue:#4da3ff;
+  --role-pink:#f472b6;
+  --role-teal:#2dd4bf;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--teal-bg2);
+  color:var(--dark);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* BG */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78,205,196,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255,107,157,0.07) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234ecdc4' fill-opacity='0.025'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(78,205,196,0.18);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 2px 16px rgba(78,205,196,0.08)}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-img{width:28px;height:28px;border-radius:8px;overflow:hidden;border:1.5px solid rgba(78,205,196,0.3);box-shadow:0 4px 12px rgba(78,205,196,0.2);flex-shrink:0}
+.nav-logo-img img{width:100%;height:100%;object-fit:cover}
+.nav-brand{font-size:13px;font-weight:900;color:var(--dark);letter-spacing:-0.3px}
+.nav-brand span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-badge{display:flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.25);border-radius:100px;font-size:9.5px;font-weight:700;color:var(--teal-d);font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;white-space:nowrap;flex-shrink:0}
+.nav-back{padding:7px 14px;border-radius:14px;border:1px solid rgba(78,205,196,0.2);background:rgba(78,205,196,0.08);color:var(--teal-d);font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer;transition:all 0.22s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
+.nav-back:hover{background:rgba(78,205,196,0.15);transform:translateY(-1px)}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0);pointer-events:none;transition:background 0.3s ease,backdrop-filter 0.3s ease}
+.overlay.open{background:rgba(0,0,0,0.38);pointer-events:auto;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+
+/* SIDE MENU */
+.side-menu{position:fixed;top:0;left:0;bottom:0;z-index:100;width:280px;background:rgba(240,252,251,0.97);backdrop-filter:blur(32px) saturate(180%);-webkit-backdrop-filter:blur(32px) saturate(180%);border-right:1px solid rgba(78,205,196,0.2);box-shadow:8px 0 48px rgba(78,205,196,0.12);transform:translate3d(-100%,0,0);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;overflow:hidden}
+.side-menu.open{transform:translate3d(0,0,0)}
+.sm-head{padding:32px 22px 20px;border-bottom:1px solid rgba(78,205,196,0.15);display:flex;align-items:center;gap:14px;position:relative}
+.sm-logo{width:46px;height:46px;border-radius:14px;overflow:hidden;border:1px solid rgba(78,205,196,0.3);box-shadow:0 6px 20px rgba(78,205,196,0.2);flex-shrink:0}
+.sm-logo img{width:100%;height:100%;object-fit:cover}
+.sm-brand{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.sm-title{font-size:17px;font-weight:800;letter-spacing:-0.4px;color:var(--dark)}
+.sm-close{position:absolute;top:18px;right:18px;width:30px;height:30px;border-radius:50%;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);color:var(--gray);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.sm-close:hover{background:rgba(78,205,196,0.2);color:var(--dark)}
+.sm-nav{padding:16px 14px;flex:1;display:flex;flex-direction:column;gap:4px}
+.sm-btn{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:13px;background:none;border:none;width:100%;color:var(--gray);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:transform 0.18s,color 0.18s,background 0.18s;text-align:left;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.sm-btn:hover{background:rgba(78,205,196,0.1);color:var(--dark);transform:translate3d(3px,0,0)}
+.sm-btn .sm-ico{font-size:20px;width:26px;text-align:center}
+.sm-btn .sm-lbl{flex:1}
+.sm-btn .sm-arr{font-size:11px;color:var(--teal)}
+.sm-sep{height:1px;background:rgba(78,205,196,0.15);margin:8px 14px}
+.sm-footer{padding:16px 20px;border-top:1px solid rgba(78,205,196,0.15);text-align:center;font-size:9.5px;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+.sm-footer span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.tb-menu-btn{width:32px;height:32px;border-radius:9px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;transition:background 0.18s,transform 0.15s;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;margin-right:2px}
+.tb-menu-btn:hover{background:rgba(78,205,196,0.16)}
+.tb-menu-btn:active{transform:scale(0.93)}
+.tb-menu-btn span{display:block;width:14px;height:1.6px;background:var(--teal-d);border-radius:2px}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* HERO */
+.team-hero{text-align:center;padding:56px 0 44px;animation:fadeUp 0.6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;margin-bottom:24px;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal-d);font-family:'JetBrains Mono',monospace}
+.team-hero h1{font-size:clamp(28px,6vw,46px);font-weight:1000;letter-spacing:-1.5px;color:var(--dark);margin-bottom:10px}
+.team-hero h1 span{background:linear-gradient(135deg,var(--teal),var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.team-hero p{font-size:13.5px;color:var(--gray);max-width:380px;margin:0 auto;line-height:1.7}
+
+/* SECTION HEAD */
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sec-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid rgba(78,205,196,0.2);background:var(--teal-bg)}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(78,205,196,0.2),transparent)}
+
+/* OWNER CARD */
+.owner-section{margin-bottom:36px}
+.owner-card{background:white;border:1px solid rgba(78,205,196,0.18);border-radius:24px;padding:28px 26px;box-shadow:var(--card-sh);display:flex;align-items:center;gap:24px;cursor:pointer;transition:transform 0.22s cubic-bezier(0.34,1.2,0.64,1),box-shadow 0.22s ease;position:relative;overflow:hidden}
+.owner-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--teal),var(--teal-d),var(--pink))}
+.owner-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 20px 56px rgba(78,205,196,0.22)}
+.owner-card:active{transform:scale(0.99)}
+.owner-avatar{width:88px;height:88px;border-radius:22px;flex-shrink:0;overflow:hidden;border:2px solid rgba(78,205,196,0.25);box-shadow:0 8px 28px rgba(78,205,196,0.2)}
+.owner-avatar img{width:100%;height:100%;object-fit:cover;transition:transform 0.35s ease}
+.owner-card:hover .owner-avatar img{transform:scale(1.06)}
+.owner-info{flex:1;min-width:0}
+.owner-crown{font-size:18px;margin-bottom:4px;display:block}
+.owner-name{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:var(--dark);margin-bottom:6px}
+.owner-role-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.25);border-radius:100px;font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--teal-d);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.owner-desc{font-size:12px;color:var(--gray);line-height:1.6;max-width:400px}
+.owner-wa{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:8px 16px;border-radius:10px;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.22);font-size:11.5px;font-weight:700;color:#18a34a;font-family:'Nunito',sans-serif;cursor:pointer;transition:background 0.18s,transform 0.15s;text-decoration:none;touch-action:manipulation}
+.owner-wa:hover{background:rgba(37,211,102,0.15);transform:translateY(-1px)}
+
+/* TEAM GRID */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:36px}
+
+/* MEMBER CARD */
+.member-card{background:white;border:1px solid rgba(78,205,196,0.14);border-radius:20px;padding:22px 18px;cursor:pointer;transition:transform 0.22s cubic-bezier(0.34,1.2,0.64,1),box-shadow 0.22s ease,border-color 0.22s ease;box-shadow:var(--card-s);display:flex;flex-direction:column;align-items:center;text-align:center}
+.member-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:var(--card-sh)}
+.member-card:active{transform:scale(0.97)}
+.mc-teal-h:hover{border-color:rgba(78,205,196,0.35)}
+.mc-purple-h:hover{border-color:rgba(167,139,250,0.35)}
+.mc-blue-h:hover{border-color:rgba(77,163,255,0.35)}
+.mc-green-h:hover{border-color:rgba(46,204,113,0.35)}
+.mc-pink-h:hover{border-color:rgba(244,114,182,0.35)}
+
+.mc-avatar{width:72px;height:72px;border-radius:18px;overflow:hidden;border:2px solid rgba(78,205,196,0.2);box-shadow:0 6px 20px rgba(78,205,196,0.15);margin-bottom:13px;transition:transform 0.3s ease}
+.member-card:hover .mc-avatar{transform:scale(1.07) translateY(-2px)}
+.mc-avatar img{width:100%;height:100%;object-fit:cover}
+.mc-name{font-size:14px;font-weight:800;letter-spacing:-0.3px;color:var(--dark);margin-bottom:6px}
+.mc-role{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:11px}
+
+/* Role colors — light theme */
+.role-purple{background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--purple)}
+.role-blue{background:rgba(77,163,255,0.1);border:1px solid rgba(77,163,255,0.25);color:var(--blue)}
+.role-green{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.25);color:#18a34a}
+.role-pink{background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.25);color:var(--role-pink)}
+.role-teal{background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.25);color:var(--teal-d)}
+
+.mc-desc{font-size:11.5px;color:var(--gray);line-height:1.6;margin-bottom:14px}
+.mc-num{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--gray-l);margin-bottom:10px}
+.mc-wa{width:32px;height:32px;border-radius:9px;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background 0.18s,transform 0.15s;margin-top:auto}
+.mc-wa:hover{background:rgba(37,211,102,0.18);transform:scale(1.1)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0);pointer-events:none;transition:background 0.3s,backdrop-filter 0.3s;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{background:rgba(0,0,0,0.45);pointer-events:auto;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal{width:100%;max-width:400px;background:white;border:1px solid rgba(78,205,196,0.2);border-radius:28px;box-shadow:0 32px 80px rgba(78,205,196,0.22),0 8px 32px rgba(0,0,0,0.08);overflow:hidden;position:relative;transform:scale(0.88) translateY(24px);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.28s ease}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);opacity:1}
+.modal-top{height:5px;background:linear-gradient(90deg,var(--teal),var(--teal-d),var(--pink))}
+.modal-img{width:100%;height:200px;overflow:hidden;position:relative}
+.modal-img img{width:100%;height:100%;object-fit:cover}
+.modal-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(255,255,255,0.97) 100%)}
+.modal-avatar-float{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);width:68px;height:68px;border-radius:18px;overflow:hidden;border:2.5px solid rgba(78,205,196,0.3);box-shadow:0 6px 24px rgba(78,205,196,0.2)}
+.modal-avatar-float img{width:100%;height:100%;object-fit:cover}
+.modal-body{padding:40px 24px 24px;text-align:center}
+.modal-name{font-size:18px;font-weight:900;letter-spacing:-0.4px;color:var(--dark);margin-bottom:8px}
+.modal-role-wrap{margin-bottom:14px}
+.modal-desc{font-size:12.5px;color:var(--gray);line-height:1.7;text-align:left;margin-bottom:18px}
+.modal-contact{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--teal-bg);border:1px solid rgba(78,205,196,0.18);border-radius:12px;margin-bottom:14px}
+.modal-contact-ico{font-size:16px;flex-shrink:0}
+.modal-contact-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray-l);font-family:'JetBrains Mono',monospace;margin-bottom:1px}
+.modal-contact-val{font-size:12px;font-weight:700;color:var(--dark);font-family:'JetBrains Mono',monospace}
+.modal-wa-btn{width:100%;padding:13px;background:linear-gradient(135deg,#25d366,#18a34a);border:none;border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 18px rgba(37,211,102,0.28);text-decoration:none;touch-action:manipulation}
+.modal-wa-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(37,211,102,0.38)}
+.modal-wa-btn:active{transform:scale(0.97)}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);color:var(--gray);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background 0.18s,transform 0.18s,color 0.18s;touch-action:manipulation}
+.modal-close:hover{background:rgba(255,107,107,0.12);border-color:rgba(255,107,107,0.25);color:#e53e3e;transform:rotate(90deg) scale(1.1)}
+
+/* STARTUP NOTIF */
+.startup-notif{position:fixed;top:78px;right:20px;z-index:200;background:white;border:1px solid rgba(78,205,196,0.2);border-radius:18px;padding:14px 16px;box-shadow:0 8px 32px rgba(78,205,196,0.18);display:flex;align-items:flex-start;gap:12px;max-width:300px;transform:translateX(340px);transition:transform 0.45s cubic-bezier(0.34,1.4,0.64,1)}
+.startup-notif.show{transform:translateX(0)}
+.sn-icon{width:40px;height:40px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid rgba(78,205,196,0.2)}
+.sn-icon img{width:100%;height:100%;object-fit:cover}
+.sn-body{flex:1;min-width:0}
+.sn-title{font-size:13px;font-weight:800;color:var(--dark);margin-bottom:2px}
+.sn-msg{font-size:12px;color:var(--gray);line-height:1.4}
+.sn-time{font-size:10px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-top:4px}
+.sn-close{width:22px;height:22px;border-radius:50%;border:none;background:var(--teal-bg);color:var(--gray);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.sn-close:hover{background:var(--teal-xl);color:var(--dark)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.55s ease,transform 0.55s cubic-bezier(0.34,1.2,0.64,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--teal-bg2)}
+::-webkit-scrollbar-thumb{background:var(--teal-xl);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+
+@media(max-width:600px){
+  .owner-card{flex-direction:column;text-align:center;gap:16px}
+  .owner-desc,.owner-wa{margin-left:auto;margin-right:auto}
+  .team-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:360px){.team-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<!-- SIDE MENU -->
+<nav class="side-menu" id="sideMenu">
+  <div class="sm-head">
+    <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+    <div>
+      <div class="sm-brand">Black Cat Ofc</div>
+      <div class="sm-title">Mezuka MD V4</div>
+    </div>
+    <button class="sm-close" onclick="closeMenu()">✕</button>
+  </div>
+  <div class="sm-nav">
+    <button class="sm-btn" onclick="navigate('main.html')">
+      <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('pair.html')">
+      <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('settings.html')">
+      <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('react.html')">
+      <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('shop.html')">
+      <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('team.html')">
+      <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('contact.html')">
+      <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('tharidu.html')">
+      <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+    </button>
+  </div>
+  <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+</nav>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="nav-logo-img"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="Mezuka"></div>
+    <div class="nav-brand">Mezuka MD <span>V4</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="nav-badge">👥 TEAM</div>
+    <a class="nav-back" href="index.html">← Back</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="team-hero">
+    <div class="hero-pill">👥 Black Cat Ofc</div>
+    <h1>Meet the <span>Admin Team</span></h1>
+    <p>The amazing people behind Mezuka MD V4. Tap any card to learn more.</p>
+  </div>
+
+  <!-- OWNER -->
+  <div class="owner-section reveal">
+    <div class="sec-head">
+      <div class="sec-icon">👑</div>
+      <div class="sec-title">Main Owner</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="owner-card" onclick="openModal(0)">
+      <div class="owner-avatar">
+        <img src="https://files.catbox.moe/sfe9ad.jpg" alt="Nimeshka Mihiran" loading="eager">
+      </div>
+      <div class="owner-info">
+        <span class="owner-crown">👑</span>
+        <div class="owner-name">Nimeshka Mihiran</div>
+        <div class="owner-role-pill">⭐ Main Owner &amp; Team Leader</div>
+        <div class="owner-desc">The founder and main developer of Mezuka MD V4 and Black Cat Ofc. Handles all core development, architecture, and team leadership.</div>
+        <a class="owner-wa" href="https://wa.me/94721584279" target="_blank" onclick="event.stopPropagation()">📱 WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMINS -->
+  <div class="reveal">
+    <div class="sec-head">
+      <div class="sec-icon">🛡️</div>
+      <div class="sec-title">Admins &amp; Leaders</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="team-grid">
+
+      <div class="member-card mc-blue-h" onclick="openModal(1)">
+        <div class="mc-avatar"><img src="https://files.catbox.moe/fw4btt.jpg" alt="Manish" loading="lazy"></div>
+        <div class="mc-name">Manish</div>
+        <div class="mc-role role-blue">🛡️ 2nd Admin</div>
+        <div class="mc-desc">Second admin and team co-leader. Supports core operations and manages team coordination.</div>
+        <div class="mc-num">Tap to view profile</div>
+        <a class="mc-wa" href="https://wa.me/9779844545882" target="_blank" onclick="event.stopPropagation()">📱</a>
+      </div>
+
+      <div class="member-card mc-purple-h" onclick="openModal(2)">
+        <div class="mc-avatar"><img src="https://files.catbox.moe/my5uuf.jpg" alt="Thenuja" loading="lazy"></div>
+        <div class="mc-name">Thenuja</div>
+        <div class="mc-role role-purple">🎯 2nd Team Leader</div>
+        <div class="mc-desc">Second team leader helping guide the group and keeping everything running smoothly.</div>
+        <div class="mc-num">Tap to view profile</div>
+        <a class="mc-wa" href="https://wa.me/94774618575" target="_blank" onclick="event.stopPropagation()">📱</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MEMBERS -->
+  <div class="reveal">
+    <div class="sec-head">
+      <div class="sec-icon">🌟</div>
+      <div class="sec-title">Team Members</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="team-grid">
+
+      <div class="member-card mc-green-h" onclick="openModal(3)">
+        <div class="mc-avatar"><img src="https://files.catbox.moe/nz2421.jpg" alt="Vinusha" loading="lazy"></div>
+        <div class="mc-name">Vinusha</div>
+        <div class="mc-role role-green">💚 Team Manager &amp; Helper</div>
+        <div class="mc-desc">Manages team activities and helps members with day-to-day support and guidance.</div>
+        <div class="mc-num">Tap to view profile</div>
+        <a class="mc-wa" href="https://wa.me/94XXXXXXXXX" target="_blank" onclick="event.stopPropagation()">📱</a>
+      </div>
+
+      <div class="member-card mc-pink-h" onclick="openModal(4)">
+        <div class="mc-avatar"><img src="https://files.catbox.moe/hdhwxf.jpg" alt="Nethusha" loading="lazy"></div>
+        <div class="mc-name">Nethusha</div>
+        <div class="mc-role role-pink">📸 Social Media Handler</div>
+        <div class="mc-desc">Handles social media presence, content posting, and community engagement for Black Cat Ofc.</div>
+        <div class="mc-num">Tap to view profile</div>
+        <a class="mc-wa" href="https://wa.me/94XXXXXXXXX" target="_blank" onclick="event.stopPropagation()">📱</a>
+      </div>
+
+      <div class="member-card mc-teal-h" onclick="openModal(5)">
+        <div class="mc-avatar"><img src="https://files.catbox.moe/pfw1kf.jpg" alt="Harshi Dewmini" loading="lazy"></div>
+        <div class="mc-name">Harshi Dewmini</div>
+        <div class="mc-role role-teal">💫 Admin Supporter</div>
+        <div class="mc-desc">Social media handler and admin supporter, helping with promotions and community building.</div>
+        <div class="mc-num">Tap to view profile</div>
+        <a class="mc-wa" href="https://wa.me/94XXXXXXXXX" target="_blank" onclick="event.stopPropagation()">📱</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-top"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img">
+      <img id="modalImg" src="" alt="">
+      <div class="modal-avatar-float"><img id="modalAvatar" src="" alt=""></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-role-wrap" id="modalRole"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-contact" id="modalContact">
+        <div class="modal-contact-ico">📱</div>
+        <div>
+          <div class="modal-contact-label">WhatsApp Number</div>
+          <div class="modal-contact-val" id="modalNum"></div>
+        </div>
+      </div>
+      <a class="modal-wa-btn" id="modalWaBtn" href="#" target="_blank">📱 Chat on WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- STARTUP NOTIF -->
+<div class="startup-notif" id="startupNotif">
+  <div class="sn-icon"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+  <div class="sn-body">
+    <div class="sn-title">Black Cat Ofc Team</div>
+    <div class="sn-msg">Meet the people behind Mezuka MD V4 🔥</div>
+    <div class="sn-time">just now</div>
+  </div>
+  <button class="sn-close" onclick="document.getElementById('startupNotif').classList.remove('show')">✕</button>
+</div>
+
+<script>
+const TEAM = [
+  {
+    name:'Nimeshka Mihiran',role:'Main Owner & Team Leader',roleClass:'role-teal',roleEmoji:'👑',
+    img:'https://files.catbox.moe/sfe9ad.jpg',number:'94721584279',
+    desc:'The founder and main developer of Mezuka MD V4. Created Black Cat Ofc from the ground up and leads the entire team. Passionate about WhatsApp automation and building tools for the community.'
+  },
+  {
+    name:'Manish',role:'2nd Admin & Team Co-Leader',roleClass:'role-blue',roleEmoji:'🛡️',
+    img:'https://files.catbox.moe/fw4btt.jpg',number:'9779844545882',
+    desc:'Second admin of Black Cat Ofc. Handles team coordination, member support, and works closely with the main owner to manage day-to-day operations.'
+  },
+  {
+    name:'Thenuja',role:'2nd Team Leader',roleClass:'role-purple',roleEmoji:'🎯',
+    img:'https://files.catbox.moe/my5uuf.jpg',number:'94774618575',
+    desc:'Second team leader who keeps the group organized and members motivated. Coordinates between admins and regular members to keep everything running smoothly.'
+  },
+  {
+    name:'Vinusha',role:'Team Manager & Helper',roleClass:'role-green',roleEmoji:'💚',
+    img:'https://files.catbox.moe/nz2421.jpg',number:'94XXXXXXXXX',
+    desc:'Team manager responsible for day-to-day member support. Always ready to help users with bot setup, troubleshooting, and general guidance.'
+  },
+  {
+    name:'Nethusha',role:'Social Media Handler',roleClass:'role-pink',roleEmoji:'📸',
+    img:'https://files.catbox.moe/hdhwxf.jpg',number:'94XXXXXXXXX',
+    desc:'Manages all social media channels for Black Cat Ofc. Creates content, handles posts, and keeps the community engaged across all platforms.'
+  },
+  {
+    name:'Harshi Dewmini',role:'Admin Supporter',roleClass:'role-teal',roleEmoji:'💫',
+    img:'https://files.catbox.moe/pfw1kf.jpg',number:'94XXXXXXXXX',
+    desc:'Handles additional social media platforms and provides admin support. Helps with community promotions and keeping things running smoothly behind the scenes.'
+  }
+];
+
+let activeModal = -1;
+function openModal(i) {
+  const m = TEAM[i]; if(!m) return;
+  activeModal = i;
+  document.getElementById('modalImg').src = m.img;
+  document.getElementById('modalAvatar').src = m.img;
+  document.getElementById('modalName').textContent = m.name;
+  document.getElementById('modalRole').innerHTML = `<div class="mc-role ${m.roleClass}" style="display:inline-flex">${m.roleEmoji} ${m.role}</div>`;
+  document.getElementById('modalDesc').textContent = m.desc;
+  document.getElementById('modalNum').textContent = m.number;
+  document.getElementById('modalWaBtn').href = 'https://wa.me/' + m.number.replace(/\D/g,'');
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  activeModal = -1;
+}
+function closeModalOutside(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') { if(activeModal>=0) closeModal(); else closeMenu(); } });
+
+let menuOpen = false;
+function openMenu(){if(menuOpen)return;menuOpen=true;document.getElementById('sideMenu').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeMenu(){if(!menuOpen)return;menuOpen=false;document.getElementById('sideMenu').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow=''}
+function navigate(page){closeMenu();setTimeout(()=>window.location.href=page,180)}
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Startup notif
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('startupNotif').classList.add('show');
+    setTimeout(()=>document.getElementById('startupNotif').classList.remove('show'),5500);
+  },800);
+});
+</script>
+</body>
+</html>

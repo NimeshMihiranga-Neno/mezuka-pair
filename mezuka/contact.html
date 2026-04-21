@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mezuka MD V4 | Contact Us</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#4ecdc4;
+  --teal-d:#2bb5ab;
+  --teal-dd:#1a8f87;
+  --teal-l:#7eddd7;
+  --teal-xl:#b2ebe8;
+  --teal-bg:#e8faf9;
+  --teal-bg2:#f0fdfc;
+  --pink:#ff6b9d;
+  --pink-l:#ffb3cc;
+  --pink-bg:rgba(255,107,157,0.08);
+  --white:#fff;
+  --dark:#1a2e2e;
+  --dark2:#2a3d3d;
+  --gray:#6b8080;
+  --gray-l:#a0b8b8;
+  --gray-bg:#f5fafa;
+  --card-s:0 4px 24px rgba(78,205,196,0.13);
+  --card-sh:0 12px 40px rgba(78,205,196,0.25);
+  --green:#2ecc71;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--teal-bg2);
+  color:var(--dark);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* BG TEXTURE */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78,205,196,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255,107,157,0.07) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234ecdc4' fill-opacity='0.025'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── OVERLAY ── */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0);pointer-events:none;transition:background 0.3s ease,backdrop-filter 0.3s ease;will-change:background}
+.overlay.open{background:rgba(0,0,0,0.38);pointer-events:auto;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+
+/* ── SIDE MENU ── */
+.side-menu{
+  position:fixed;top:0;left:0;bottom:0;z-index:100;width:280px;
+  background:rgba(240,252,251,0.97);
+  backdrop-filter:blur(32px) saturate(180%);-webkit-backdrop-filter:blur(32px) saturate(180%);
+  border-right:1px solid rgba(78,205,196,0.2);
+  box-shadow:8px 0 48px rgba(78,205,196,0.12);
+  transform:translate3d(-100%,0,0);
+  transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;overflow:hidden;will-change:transform;
+}
+.side-menu.open{transform:translate3d(0,0,0)}
+.sm-head{padding:32px 22px 20px;border-bottom:1px solid rgba(78,205,196,0.15);display:flex;align-items:center;gap:14px;position:relative}
+.sm-logo{width:46px;height:46px;border-radius:14px;overflow:hidden;border:1px solid rgba(78,205,196,0.3);box-shadow:0 6px 20px rgba(78,205,196,0.2);flex-shrink:0}
+.sm-logo img{width:100%;height:100%;object-fit:cover}
+.sm-brand{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.sm-title{font-size:17px;font-weight:800;letter-spacing:-0.4px;color:var(--dark)}
+.sm-close{position:absolute;top:18px;right:18px;width:30px;height:30px;border-radius:50%;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);color:var(--gray);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.sm-close:hover{background:rgba(78,205,196,0.2);color:var(--dark)}
+.sm-nav{padding:16px 14px;flex:1;display:flex;flex-direction:column;gap:4px}
+.sm-btn{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:13px;background:none;border:none;width:100%;color:var(--gray);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:transform 0.18s,color 0.18s,background 0.18s;text-align:left;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.sm-btn:hover{background:rgba(78,205,196,0.1);color:var(--dark);transform:translate3d(3px,0,0)}
+.sm-btn:active{transform:translate3d(1px,0,0) scale(0.98)}
+.sm-btn .sm-ico{font-size:20px;width:26px;text-align:center}
+.sm-btn .sm-lbl{flex:1}
+.sm-btn .sm-arr{font-size:11px;color:var(--teal)}
+.sm-sep{height:1px;background:rgba(78,205,196,0.15);margin:8px 14px}
+.sm-footer{padding:16px 20px;border-top:1px solid rgba(78,205,196,0.15);text-align:center;font-size:9.5px;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+.sm-footer span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(78,205,196,0.18);
+  padding:0 16px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  box-shadow:0 2px 16px rgba(78,205,196,0.08);
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-img{width:28px;height:28px;border-radius:8px;overflow:hidden;border:1.5px solid rgba(78,205,196,0.3);box-shadow:0 4px 12px rgba(78,205,196,0.2);flex-shrink:0}
+.nav-logo-img img{width:100%;height:100%;object-fit:cover}
+.nav-brand{font-size:13px;font-weight:900;color:var(--dark);letter-spacing:-0.3px}
+.nav-brand span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-menu-btn{width:32px;height:32px;border-radius:9px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;transition:background 0.18s,transform 0.15s;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;margin-right:2px}
+.tb-menu-btn:hover{background:rgba(78,205,196,0.16)}
+.tb-menu-btn:active{transform:scale(0.93)}
+.tb-menu-btn span{display:block;width:14px;height:1.6px;background:var(--teal-d);border-radius:2px}
+.nav-back{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);font-size:11px;font-weight:700;color:var(--teal-d);cursor:pointer;transition:all 0.18s;font-family:'JetBrains Mono',monospace;letter-spacing:0.3px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.nav-back:hover{background:rgba(78,205,196,0.16);border-color:var(--teal)}
+
+/* ── PAGE WRAPPER ── */
+.page{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 22px 80px}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  padding:56px 0 40px;
+  text-align:center;
+  animation:fadeUp 0.6s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.page-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;margin-bottom:20px;
+  background:rgba(78,205,196,0.1);
+  border:1px solid rgba(78,205,196,0.3);border-radius:100px;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--teal-d);font-family:'JetBrains Mono',monospace;
+}
+.page-title{
+  font-size:clamp(32px,7vw,54px);
+  font-weight:1000;letter-spacing:-2px;line-height:1.0;
+  color:var(--dark);margin-bottom:12px;
+}
+.page-title .grad{
+  background:linear-gradient(135deg,var(--teal) 0%,var(--teal-d) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.page-sub{font-size:14px;color:var(--gray);max-width:380px;line-height:1.65;margin:0 auto}
+
+/* ── CONTACT CARDS ── */
+.contact-list{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+
+.contact-card{
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:20px;
+  padding:20px;
+  display:flex;align-items:center;gap:16px;
+  text-decoration:none;
+  box-shadow:var(--card-s);
+  transition:all 0.25s cubic-bezier(0.34,1.2,0.64,1);
+  position:relative;overflow:hidden;
+  animation:fadeUp 0.5s ease both;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.contact-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  border-radius:4px 0 0 4px;
+  background:linear-gradient(180deg,var(--teal),var(--teal-d));
+}
+.contact-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:var(--card-sh);border-color:rgba(78,205,196,0.3)}
+.contact-card:active{transform:scale(0.98)}
+
+.contact-card:nth-child(1){animation-delay:0.05s}
+.contact-card:nth-child(2){animation-delay:0.12s}
+.contact-card:nth-child(3){animation-delay:0.19s}
+.contact-card:nth-child(4){animation-delay:0.26s}
+.contact-card:nth-child(5){animation-delay:0.33s}
+.contact-card:nth-child(6){animation-delay:0.40s}
+
+.cc-ico{
+  width:52px;height:52px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  flex-shrink:0;
+  border:1px solid rgba(78,205,196,0.18);
+}
+.cc-green{background:linear-gradient(145deg,rgba(46,204,113,0.15),rgba(46,204,113,0.05));color:var(--green)}
+.cc-teal{background:var(--teal-bg);color:var(--teal-d)}
+.cc-pink{background:var(--pink-bg);color:var(--pink)}
+.cc-blue{background:rgba(77,163,255,0.1);color:#4da3ff}
+.cc-red{background:rgba(255,59,48,0.1);color:#ff3b30}
+.cc-purple{background:rgba(167,139,250,0.1);color:#a78bfa}
+
+.cc-body{flex:1;min-width:0}
+.cc-platform{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:var(--gray-l);margin-bottom:4px;
+}
+.cc-label{font-size:15px;font-weight:800;color:var(--dark);letter-spacing:-0.3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-value{font-size:11px;color:var(--gray);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-arr{font-size:18px;color:var(--gray-l);transition:transform 0.2s,color 0.2s;flex-shrink:0}
+.contact-card:hover .cc-arr{transform:translate3d(4px,0,0);color:var(--teal-d)}
+
+/* ── DIVIDER ── */
+.section-divider{
+  display:flex;align-items:center;gap:14px;
+  margin:24px 0 20px;
+}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:rgba(78,205,196,0.2)}
+.section-divider span{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal-d);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* ── INFO BOX ── */
+.info-box{
+  background:rgba(78,205,196,0.06);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:18px;
+  padding:20px;
+  display:flex;align-items:flex-start;gap:14px;
+  margin-top:20px;
+  animation:fadeUp 0.5s ease 0.4s both;
+}
+.info-ico{font-size:22px;flex-shrink:0;margin-top:1px}
+.info-text{font-size:13px;color:var(--gray);line-height:1.65}
+.info-text strong{color:var(--teal-d);font-weight:800}
+
+/* ── FOOTER ── */
+.footer{
+  border-top:1px solid rgba(78,205,196,0.15);
+  padding:32px 0 0;text-align:center;
+  position:relative;z-index:1;
+}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+.footer-logo-ico{width:32px;height:32px;border-radius:10px;overflow:hidden;border:1px solid rgba(78,205,196,0.2)}
+.footer-logo-ico img{width:100%;height:100%;object-fit:cover}
+.footer-name{font-size:14px;font-weight:900;color:var(--dark)}
+.footer-text{font-size:11px;color:var(--gray-l);font-family:'JetBrains Mono',monospace;line-height:2}
+.footer-text span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.footer-copy{margin-top:16px;padding:16px 0;border-top:1px solid rgba(78,205,196,0.1);font-size:10.5px;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--teal-bg2)}
+::-webkit-scrollbar-thumb{background:var(--teal-xl);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+
+@media(max-width:480px){
+  .cc-label{font-size:13.5px}
+  .cc-value{font-size:10px}
+  .page{padding:0 16px 60px}
+}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<!-- SIDE MENU -->
+<nav class="side-menu" id="sideMenu">
+  <div class="sm-head">
+    <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+    <div>
+      <div class="sm-brand">Black Cat Ofc</div>
+      <div class="sm-title">Mezuka MD V4</div>
+    </div>
+    <button class="sm-close" onclick="closeMenu()">✕</button>
+  </div>
+  <div class="sm-nav">
+    <button class="sm-btn" onclick="navigate('main.html')">
+      <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('pair.html')">
+      <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('settings.html')">
+      <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('react.html')">
+      <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('shop.html')">
+      <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('team.html')">
+      <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('contact.html')" style="background:rgba(78,205,196,0.1);color:var(--teal-d)">
+      <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('tharidu.html')">
+      <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+    </button>
+  </div>
+  <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+</nav>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="nav-logo-img"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="Mezuka"></div>
+    <div class="nav-brand">Mezuka MD <span>V4</span></div>
+  </div>
+  <a class="nav-back" href="main.html">← Back</a>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-badge">📩 Get in Touch</div>
+    <h1 class="page-title">Contact <span class="grad">Us</span></h1>
+    <p class="page-sub">Reach out via WhatsApp, Telegram, Email or join our community — we're here to help.</p>
+  </div>
+
+  <!-- CONTACT CARDS -->
+  <div class="contact-list">
+
+    <!-- WhatsApp Direct -->
+    <a class="contact-card" href="https://wa.me/94721584279" target="_blank" rel="noopener">
+      <div class="cc-ico cc-green">📱</div>
+      <div class="cc-body">
+        <div class="cc-platform">WhatsApp · Direct</div>
+        <div class="cc-label">Chat on WhatsApp</div>
+        <div class="cc-value">+94 721 584 279</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+    <!-- Email -->
+    <a class="contact-card" href="mailto:mihirangamihiranga223@gmail.com" target="_blank" rel="noopener">
+      <div class="cc-ico cc-red">✉️</div>
+      <div class="cc-body">
+        <div class="cc-platform">Email · Gmail</div>
+        <div class="cc-label">Send an Email</div>
+        <div class="cc-value">mihirangamihiranga223@gmail.com</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+    <!-- Telegram -->
+    <a class="contact-card" href="https://t.me/Nimeshmihiranga" target="_blank" rel="noopener">
+      <div class="cc-ico cc-blue">✈️</div>
+      <div class="cc-body">
+        <div class="cc-platform">Telegram · DM</div>
+        <div class="cc-label">Message on Telegram</div>
+        <div class="cc-value">@Nimeshmihiranga</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+    <div class="section-divider"><span>Community</span></div>
+
+    <!-- WhatsApp Group -->
+    <a class="contact-card" href="https://chat.whatsapp.com/JhCyqAZRQVmCms1UYHj7Hh?mode=gi_t" target="_blank" rel="noopener">
+      <div class="cc-ico cc-green">👥</div>
+      <div class="cc-body">
+        <div class="cc-platform">WhatsApp · Group</div>
+        <div class="cc-label">Join Our WA Group</div>
+        <div class="cc-value">Black Cat Ofc Community</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+    <!-- WhatsApp Channel -->
+    <a class="contact-card" href="https://whatsapp.com/channel/0029VbC1tH0L7UVPPYGED62n" target="_blank" rel="noopener">
+      <div class="cc-ico cc-teal">📢</div>
+      <div class="cc-body">
+        <div class="cc-platform">WhatsApp · Channel</div>
+        <div class="cc-label">Follow Our Channel</div>
+        <div class="cc-value">Black Cat Ofc Official Updates</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+    <!-- YouTube -->
+    <a class="contact-card" href="https://youtube.com/@blackcatofcn?si=s5wehvyDaC_6nyUm" target="_blank" rel="noopener">
+      <div class="cc-ico cc-red">▶️</div>
+      <div class="cc-body">
+        <div class="cc-platform">YouTube · Channel</div>
+        <div class="cc-label">Subscribe on YouTube</div>
+        <div class="cc-value">@blackcatofcn</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </a>
+
+  </div>
+
+  <!-- Info note -->
+  <div class="info-box">
+    <div class="info-ico">🕊️</div>
+    <div class="info-text">
+      This bot is dedicated in memory of <strong>Tharidu Gimhana</strong>. Built with love by <strong>Nimeshka Mihiran</strong> for the Black Cat Ofc community. Thank you for your support. 💙
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <div class="footer-logo-ico"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+      <div class="footer-name">Mezuka MD V4</div>
+    </div>
+    <div class="footer-text">
+      Powered by <span>Mezuka MD V4</span> · Owner: <span>Nimeshka Mihiran</span><br>
+      made by <span>nimeshka mihiran</span> · rest in peace tharidu gimhana 🕊️
+    </div>
+    <div class="footer-copy">© 2025 Black Cat Ofc · Mezuka MD V4</div>
+  </footer>
+
+</div>
+
+<script>
+  let menuOpen = false;
+  let touchStartX = 0;
+
+  function openMenu(){
+    if(menuOpen) return;
+    menuOpen = true;
+    requestAnimationFrame(()=>{
+      document.getElementById('sideMenu').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow='hidden';
+    });
+  }
+  function closeMenu(){
+    if(!menuOpen) return;
+    menuOpen = false;
+    requestAnimationFrame(()=>{
+      document.getElementById('sideMenu').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow='';
+    });
+  }
+  function navigate(page){
+    closeMenu();
+    setTimeout(()=>window.location.href=page, 180);
+  }
+
+  document.getElementById('sideMenu').addEventListener('touchstart', e=>{
+    touchStartX = e.touches[0].clientX;
+  }, {passive:true});
+  document.getElementById('sideMenu').addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(dx < -60) closeMenu();
+  }, {passive:true});
+
+  document.addEventListener('touchstart', e=>{
+    touchStartX = e.touches[0].clientX;
+  }, {passive:true});
+  document.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(touchStartX < 24 && dx > 60) openMenu();
+  }, {passive:true});
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeMenu();
+  });
+</script>
+</body>
+</html>

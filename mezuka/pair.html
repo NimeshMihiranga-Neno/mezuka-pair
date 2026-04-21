@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mezuka MD V4 | Pair</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet">
+  </noscript>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --teal: #4ecdc4;
+      --teal-d: #2bb5ab;
+      --teal-dd: #1a8f87;
+      --teal-l: #7eddd7;
+      --teal-xl: #b2ebe8;
+      --teal-bg: #e8faf9;
+      --teal-bg2: #f0fdfc;
+      --pink: #ff6b9d;
+      --white: #fff;
+      --dark: #1a2e2e;
+      --gray: #6b8080;
+      --gray-l: #a0b8b8;
+      --card-s: 0 4px 24px rgba(78, 205, 196, 0.13);
+      --card-sh: 0 12px 40px rgba(78, 205, 196, 0.25);
+      --green: #2ecc71;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--teal-bg2);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78, 205, 196, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255, 107, 157, 0.07) 0%, transparent 55%),
+        url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234ecdc4' fill-opacity='0.025'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(78, 205, 196, 0.18);
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 2px 16px rgba(78, 205, 196, 0.08)
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid rgba(78, 205, 196, 0.3);
+      box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+      flex-shrink: 0
+    }
+
+    .nav-logo-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .nav-brand {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--dark);
+      letter-spacing: -0.3px
+    }
+
+    .nav-brand span {
+      background: linear-gradient(135deg, var(--teal-d), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .nav-back {
+      padding: 7px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      background: rgba(78, 205, 196, 0.08);
+      color: var(--teal-d);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.22s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .nav-back:hover {
+      background: rgba(78, 205, 196, 0.15);
+      transform: translateY(-1px)
+    }
+
+    /* OVERLAY */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(0, 0, 0, 0);
+      pointer-events: none;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease
+    }
+
+    .overlay.open {
+      background: rgba(0, 0, 0, 0.38);
+      pointer-events: auto;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px)
+    }
+
+    /* SIDE MENU */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      width: 280px;
+      background: rgba(240, 252, 251, 0.97);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      border-right: 1px solid rgba(78, 205, 196, 0.2);
+      box-shadow: 8px 0 48px rgba(78, 205, 196, 0.12);
+      transform: translate3d(-100%, 0, 0);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .side-menu.open {
+      transform: translate3d(0, 0, 0)
+    }
+
+    .sm-head {
+      padding: 32px 22px 20px;
+      border-bottom: 1px solid rgba(78, 205, 196, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative
+    }
+
+    .sm-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      box-shadow: 0 6px 20px rgba(78, 205, 196, 0.2);
+      flex-shrink: 0
+    }
+
+    .sm-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .sm-brand {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      background: linear-gradient(135deg, var(--teal-d), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 2px
+    }
+
+    .sm-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--dark)
+    }
+
+    .sm-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(78, 205, 196, 0.1);
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      color: var(--gray);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s
+    }
+
+    .sm-close:hover {
+      background: rgba(78, 205, 196, 0.2);
+      color: var(--dark)
+    }
+
+    .sm-nav {
+      padding: 16px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .sm-btn {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 13px 14px;
+      border-radius: 13px;
+      background: none;
+      border: none;
+      width: 100%;
+      color: var(--gray);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s, color 0.18s, background 0.18s;
+      text-align: left;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation
+    }
+
+    .sm-btn:hover {
+      background: rgba(78, 205, 196, 0.1);
+      color: var(--dark);
+      transform: translate3d(3px, 0, 0)
+    }
+
+    .sm-btn .sm-ico {
+      font-size: 20px;
+      width: 26px;
+      text-align: center
+    }
+
+    .sm-btn .sm-lbl {
+      flex: 1
+    }
+
+    .sm-btn .sm-arr {
+      font-size: 11px;
+      color: var(--teal)
+    }
+
+    .sm-sep {
+      height: 1px;
+      background: rgba(78, 205, 196, 0.15);
+      margin: 8px 14px
+    }
+
+    .sm-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(78, 205, 196, 0.15);
+      text-align: center;
+      font-size: 9.5px;
+      color: var(--gray-l);
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .sm-footer span {
+      background: linear-gradient(135deg, var(--teal-d), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700
+    }
+
+    .tb-menu-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: rgba(78, 205, 196, 0.08);
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s;
+      flex-shrink: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      margin-right: 2px
+    }
+
+    .tb-menu-btn:hover {
+      background: rgba(78, 205, 196, 0.16)
+    }
+
+    .tb-menu-btn:active {
+      transform: scale(0.93)
+    }
+
+    .tb-menu-btn span {
+      display: block;
+      width: 14px;
+      height: 1.6px;
+      background: var(--teal-d);
+      border-radius: 2px
+    }
+
+    /* PAGE */
+    .page {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 22px 60px
+    }
+
+    /* PAIR CARD */
+    .pair-card {
+      width: 100%;
+      max-width: 460px;
+      background: white;
+      border: 1px solid rgba(78, 205, 196, 0.18);
+      border-radius: 28px;
+      box-shadow: var(--card-sh);
+      overflow: hidden;
+      animation: cardPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both
+    }
+
+    @keyframes cardPop {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0)
+      }
+    }
+
+    .pair-card-top {
+      height: 5px;
+      background: linear-gradient(90deg, var(--teal), var(--teal-d), var(--pink))
+    }
+
+    .pair-card-body {
+      padding: 36px 32px 32px
+    }
+
+    /* HEADER */
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(78, 205, 196, 0.25);
+      box-shadow: 0 8px 24px rgba(78, 205, 196, 0.22);
+      flex-shrink: 0
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .logo-brand {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      background: linear-gradient(135deg, var(--teal-d), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 2px
+    }
+
+    .logo-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: var(--dark)
+    }
+
+    .logo-title span {
+      background: linear-gradient(135deg, var(--teal), var(--teal-d));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--gray-l);
+      margin-bottom: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.2px
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 22px;
+      background: var(--teal-bg);
+      border: 1px solid rgba(78, 205, 196, 0.18);
+      border-radius: 16px;
+      padding: 5px
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12.5px;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .tab-btn:hover {
+      color: var(--dark)
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: var(--teal-d);
+      box-shadow: 0 3px 14px rgba(78, 205, 196, 0.2);
+      border: 1px solid rgba(78, 205, 196, 0.2)
+    }
+
+    /* PANELS */
+    .panel {
+      display: none
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeUp 0.3s ease both
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* INPUT */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 8px
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      pointer-events: none
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 14px 13px 44px;
+      background: var(--teal-bg);
+      border: 1.5px solid rgba(78, 205, 196, 0.22);
+      border-radius: 14px;
+      color: var(--dark);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.22s
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--gray-l);
+      font-weight: 500
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(78, 205, 196, 0.5);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.12)
+    }
+
+    .hint {
+      font-size: 10.5px;
+      color: var(--gray-l);
+      margin-bottom: 20px;
+      padding-left: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.5
+    }
+
+    /* BUTTON */
+    .pair-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-d));
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+      box-shadow: 0 6px 28px rgba(78, 205, 196, 0.38);
+      letter-spacing: -0.2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px
+    }
+
+    .pair-btn:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(78, 205, 196, 0.48)
+    }
+
+    .pair-btn:active {
+      transform: scale(0.97)
+    }
+
+    .pair-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none
+    }
+
+    /* QR */
+    .qr-desc {
+      font-size: 12.5px;
+      color: var(--gray);
+      margin-bottom: 18px;
+      line-height: 1.6;
+      text-align: center
+    }
+
+    .qr-wrap {
+      display: none;
+      justify-content: center;
+      margin-top: 20px
+    }
+
+    #qrcode-container {
+      background: white;
+      padding: 14px;
+      border-radius: 16px;
+      border: 2px solid rgba(78, 205, 196, 0.25);
+      box-shadow: 0 8px 32px rgba(78, 205, 196, 0.18);
+      display: inline-block
+    }
+
+    /* SPINNER */
+    .spinner {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 2.5px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* RESULT */
+    .result {
+      margin-top: 20px;
+      border-radius: 18px;
+      padding: 20px;
+      display: none;
+      animation: fadeUp 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) both
+    }
+
+    .result.success {
+      background: rgba(46, 204, 113, 0.07);
+      border: 1.5px solid rgba(46, 204, 113, 0.22)
+    }
+
+    .result.error {
+      background: rgba(255, 107, 107, 0.07);
+      border: 1.5px solid rgba(255, 107, 107, 0.22)
+    }
+
+    .result.info {
+      background: var(--teal-bg);
+      border: 1.5px solid rgba(78, 205, 196, 0.28)
+    }
+
+    .result-icon {
+      font-size: 28px;
+      margin-bottom: 8px
+    }
+
+    .result-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 4px;
+      letter-spacing: -0.2px
+    }
+
+    .result-msg {
+      font-size: 12px;
+      color: var(--gray);
+      line-height: 1.55;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* CODE */
+    .code-display {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 7px;
+      background: linear-gradient(135deg, var(--teal-d), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-color: var(--teal-bg);
+      border: 1.5px solid rgba(78, 205, 196, 0.3);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin: 14px 0 4px;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      user-select: none
+    }
+
+    .code-display:hover {
+      background-color: var(--teal-xl);
+      transform: scale(1.02);
+      box-shadow: 0 8px 28px rgba(78, 205, 196, 0.22)
+    }
+
+    .code-display:active {
+      transform: scale(0.98)
+    }
+
+    .copied-badge {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 20px;
+      display: none;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap
+    }
+
+    .copy-hint {
+      font-size: 10px;
+      color: var(--gray-l);
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* STEPS */
+    .steps {
+      margin-top: 14px;
+      text-align: left;
+      background: var(--teal-bg);
+      border: 1px solid rgba(78, 205, 196, 0.18);
+      border-radius: 14px;
+      padding: 14px 16px
+    }
+
+    .steps-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--teal-d);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 10px
+    }
+
+    .steps p {
+      font-size: 12px;
+      color: var(--gray);
+      margin-bottom: 5px;
+      line-height: 1.6
+    }
+
+    .steps p:last-child {
+      margin-bottom: 0
+    }
+
+    .steps strong {
+      color: var(--dark);
+      font-weight: 700
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(78, 205, 196, 0.12);
+      margin: 24px 0
+    }
+
+    .card-footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--gray-l);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px;
+      line-height: 1.8
+    }
+
+    .card-footer span {
+      background: linear-gradient(135deg, var(--teal-d), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700
+    }
+
+    /* STARTUP NOTIF */
+    .startup-notif {
+      position: fixed;
+      top: 78px;
+      right: 20px;
+      z-index: 200;
+      background: white;
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 32px rgba(78, 205, 196, 0.18);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      max-width: 300px;
+      transform: translateX(340px);
+      transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1)
+    }
+
+    .startup-notif.show {
+      transform: translateX(0)
+    }
+
+    .sn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(78, 205, 196, 0.2)
+    }
+
+    .sn-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .sn-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .sn-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 2px
+    }
+
+    .sn-msg {
+      font-size: 12px;
+      color: var(--gray);
+      line-height: 1.4
+    }
+
+    .sn-time {
+      font-size: 10px;
+      color: var(--teal);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px
+    }
+
+    .sn-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: var(--teal-bg);
+      color: var(--gray);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0
+    }
+
+    .sn-close:hover {
+      background: var(--teal-xl);
+      color: var(--dark)
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--teal-bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--teal-xl);
+      border-radius: 3px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--teal)
+    }
+
+    @media(max-width:480px) {
+      .pair-card-body {
+        padding: 28px 20px 24px
+      }
+
+      .code-display {
+        font-size: 24px;
+        letter-spacing: 5px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+  <nav class="side-menu" id="sideMenu">
+    <div class="sm-head">
+      <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+      <div>
+        <div class="sm-brand">Black Cat Ofc</div>
+        <div class="sm-title">Mezuka MD V4</div>
+      </div>
+      <button class="sm-close" onclick="closeMenu()">✕</button>
+    </div>
+    <div class="sm-nav">
+      <button class="sm-btn" onclick="navigate('main.html')">
+        <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+      </button>
+      <button class="sm-btn" onclick="navigate('pair.html')" style="background:rgba(78,205,196,0.1);color:var(--teal-d)">
+        <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+      </button>
+      <button class="sm-btn" onclick="navigate('settings.html')">
+        <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+      </button>
+      <div class="sm-sep"></div>
+      <button class="sm-btn" onclick="navigate('react.html')">
+        <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+      </button>
+      <button class="sm-btn" onclick="navigate('shop.html')">
+        <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+      </button>
+      <div class="sm-sep"></div>
+      <button class="sm-btn" onclick="navigate('team.html')">
+        <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+      </button>
+      <button class="sm-btn" onclick="navigate('contact.html')">
+        <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+      </button>
+      <div class="sm-sep"></div>
+      <button class="sm-btn" onclick="navigate('tharidu.html')">
+        <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+      </button>
+    </div>
+    <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+  </nav>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+      <div class="nav-logo-img"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="Mezuka"></div>
+      <div class="nav-brand">Mezuka MD <span>V4</span></div>
+    </div>
+    <a class="nav-back" href="main.html">← Back</a>
+  </nav>
+
+  <div class="page">
+    <div class="pair-card">
+      <div class="pair-card-top"></div>
+      <div class="pair-card-body">
+
+        <div class="logo-wrap">
+          <div class="logo-icon"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+          <div>
+            <div class="logo-brand">Black Cat Ofc</div>
+            <div class="logo-title">Mezuka MD <span>V4</span></div>
+          </div>
+        </div>
+        <p class="subtitle">WhatsApp Bot Pairing Panel</p>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" id="tab-phone" onclick="switchTab('phone')">📱 Phone Code</button>
+          <button class="tab-btn" id="tab-qr" onclick="switchTab('qr')">📷 Scan QR</button>
+        </div>
+
+        <!-- Phone Panel -->
+        <div id="panel-phone" class="panel active">
+          <div class="input-wrap">
+            <span class="icon">📱</span>
+            <input type="text" id="numInput" placeholder="94712345678 (country code + number)" maxlength="15" />
+          </div>
+          <p class="hint">⚠️ Enter full number with country code. No + or spaces.</p>
+          <button class="pair-btn" id="pairBtn" onclick="getPairCode()">🔗 Get Pair Code</button>
+        </div>
+
+        <!-- QR Panel -->
+        <div id="panel-qr" class="panel">
+          <p class="qr-desc">Generate a QR code and scan it via WhatsApp<br><strong>Settings → Linked Devices → Link a
+              Device</strong></p>
+          <button class="pair-btn" id="qrBtn" onclick="getQRCode()">📷 Generate QR Code</button>
+          <div class="qr-wrap" id="qrWrap">
+            <div id="qrcode-container"></div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="result" id="resultBox">
+          <div class="result-icon" id="resultIcon"></div>
+          <div class="result-title" id="resultTitle"></div>
+          <div id="codeWrap" style="display:none;position:relative">
+            <div class="code-display" onclick="copyCode()">
+              <span class="copied-badge" id="copiedBadge">✓ Copied!</span>
+              <span id="codeText"></span>
+            </div>
+            <p class="copy-hint">👆 tap to copy</p>
+          </div>
+          <p class="result-msg" id="resultMsg"></p>
+          <div class="steps" id="stepsWrap" style="display:none">
+            <div class="steps-title">How to link</div>
+            <p>1️⃣ Open WhatsApp on your phone</p>
+            <p>2️⃣ Go to <strong>Settings → Linked Devices</strong></p>
+            <p>3️⃣ Tap <strong>Link a Device</strong></p>
+            <p>4️⃣ Choose <strong>"Link with phone number"</strong></p>
+            <p>5️⃣ Enter the code above ☝️</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card-footer">
+          Powered by <span>Mezuka MD V4</span> · Owner: <span>Nimeshka Mihiran</span><br>
+          <span style="opacity:0.6">made by nimeshka mihiran</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="startup-notif" id="startupNotif">
+    <div class="sn-icon"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+    <div class="sn-body">
+      <div class="sn-title">made by nimeshka mihiran</div>
+      <div class="sn-msg">rest in peace tharidu gimhana 🕊️</div>
+      <div class="sn-time">just now</div>
+    </div>
+    <button class="sn-close" onclick="document.getElementById('startupNotif').classList.remove('show')">✕</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    function navigate(url) { window.location.href = url }
+    function openMenu() { document.getElementById('sideMenu').classList.add('open'); document.getElementById('overlay').classList.add('open') }
+    function closeMenu() { document.getElementById('sideMenu').classList.remove('open'); document.getElementById('overlay').classList.remove('open') }
+
+    let qrPollInterval;
+    let qrCurrentData = null;
+
+    function switchTab(tab) {
+      ['phone', 'qr'].forEach(t => {
+        document.getElementById('tab-' + t).classList.remove('active');
+        document.getElementById('panel-' + t).classList.remove('active');
+      });
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+      document.getElementById('resultBox').style.display = 'none';
+      stopQRPolling();
+      document.getElementById('qrWrap').style.display = 'none';
+      document.getElementById('qrcode-container').innerHTML = '';
+      const qrBtn = document.getElementById('qrBtn');
+      qrBtn.disabled = false;
+      qrBtn.innerHTML = '📷 Generate QR Code';
+    }
+
+    function stopQRPolling() {
+      if (qrPollInterval) { clearInterval(qrPollInterval); qrPollInterval = null; }
+      qrCurrentData = null;
+    }
+
+    async function getPairCode() {
+      const input = document.getElementById('numInput').value.trim();
+      const btn = document.getElementById('pairBtn');
+      if (!input || input.length < 7) { showResult('error', '❌', 'Invalid Number', 'Please enter a valid phone number with country code.'); return; }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generating...';
+      document.getElementById('resultBox').style.display = 'none';
+      document.getElementById('codeWrap').style.display = 'none';
+      document.getElementById('stepsWrap').style.display = 'none';
+      try {
+        const res = await fetch(`/code?number=${encodeURIComponent(input)}`);
+        const data = await res.json();
+        if (data.status === 'success' && data.code) {
+          document.getElementById('codeText').textContent = data.code;
+          document.getElementById('codeWrap').style.display = 'block';
+          document.getElementById('stepsWrap').style.display = 'block';
+          showResult('success', '✅', 'Pair Code Ready!', `Number: ${data.number}`);
+        } else if (data.status === 'server_full') {
+          showResult('error', '🚫', 'Server Full!', `Maximum ${data.limit || 150} bots connected. Please try again later. Currently: ${data.connected || '?'} bots online.`);
+        } else if (data.status === 'already_connected') {
+          showResult('info', '🔗', 'Already Connected', `${data.number} is already connected and active.`);
+        } else if (data.status === 'already_registered') {
+          showResult('info', '🔄', 'Reconnecting...', data.message || 'Session found. Bot is reconnecting.');
+        } else {
+          showResult('error', '❌', 'Failed', data.error || data.message || 'Could not generate code. Try again.');
+        }
+      } catch (err) { showResult('error', '❌', 'Connection Error', 'Could not reach server. Make sure the bot is running.'); }
+      btn.disabled = false;
+      btn.innerHTML = '🔗 Get Pair Code';
+    }
+
+    async function getQRCode() {
+      const btn = document.getElementById('qrBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Starting...';
+      document.getElementById('qrWrap').style.display = 'none';
+      document.getElementById('qrcode-container').innerHTML = '';
+      document.getElementById('resultBox').style.display = 'none';
+      stopQRPolling();
+
+      let sessionId = null;
+      let lastQR = null;
+      let countdownSecs = 60;
+      let countdownTimer = null;
+
+      function startCountdown() {
+        countdownSecs = 60;
+        if (countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = setInterval(() => {
+          countdownSecs--;
+          if (countdownSecs > 0) {
+            btn.innerHTML = `<span class="spinner"></span> Scan within ${countdownSecs}s...`;
+          } else {
+            clearInterval(countdownTimer);
+            btn.innerHTML = '<span class="spinner"></span> QR Refreshing...';
+          }
+        }, 1000);
+      }
+
+      function renderQR(qrString) {
+        document.getElementById('qrcode-container').innerHTML = '';
+        new QRCode(document.getElementById('qrcode-container'), {
+          text: qrString,
+          width: 220, height: 220,
+          colorDark: '#000000', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        document.getElementById('qrWrap').style.display = 'flex';
+        lastQR = qrString;
+        startCountdown(); // reset countdown whenever QR refreshes
+      }
+
+      function cleanup() {
+        stopQRPolling();
+        if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        btn.disabled = false;
+        btn.innerHTML = '📷 Generate QR Code';
+      }
+
+      try {
+        // Step 1: Start QR session — get sessionId instantly
+        const initRes = await fetch('/api/qr');
+        const initData = await initRes.json();
+
+        // ── SERVER FULL CHECK ─────────────────────────────────
+        if (initData.status === 'server_full') {
+          showResult('error', '🚫', 'Server Full!', `Maximum ${initData.limit || 150} bots connected. Please try again later. Currently: ${initData.connected || '?'} bots online.`);
+          cleanup();
+          return;
+        }
+        // ─────────────────────────────────────────────────────
+
+        if (!initData.sessionId) {
+          showResult('error', '❌', 'Failed', 'Could not start QR session. Try again.');
+          cleanup();
+          return;
+        }
+        sessionId = initData.sessionId;
+        btn.innerHTML = '<span class="spinner"></span> Waiting for QR...';
+
+        // Step 2: Poll /api/qr/poll every 2.5s for fresh QR data
+        qrPollInterval = setInterval(async () => {
+          try {
+            const pollRes = await fetch('/api/qr/poll?sessionId=' + sessionId);
+            const pollData = await pollRes.json();
+
+            // ✅ Success — bot linked
+            if (pollData.status === 'success') {
+              cleanup();
+              document.getElementById('qrWrap').style.display = 'none';
+              showResult('success', '✅', 'Linked Successfully!',
+                `Bot is now live${pollData.number ? ' for ' + pollData.number : ''}! Starting up in the background.`);
+              return;
+            }
+
+            // ❌ Failed or expired
+            if (pollData.status === 'failed' || pollData.status === 'expired') {
+              cleanup();
+              document.getElementById('qrWrap').style.display = 'none';
+              showResult('error', '⏱️', 'QR Expired or Failed',
+                'The QR code expired or connection was lost. Click "Generate QR Code" to try again.');
+              return;
+            }
+
+            // 🔄 Pending — update QR display if new QR arrived
+            if (pollData.status === 'pending' && pollData.qr && pollData.qr !== lastQR) {
+              renderQR(pollData.qr);
+            }
+
+          } catch (pollErr) {
+            console.warn('QR poll error:', pollErr);
+          }
+        }, 2500);
+
+      } catch (err) {
+        showResult('error', '❌', 'Connection Error', 'Could not reach server. Make sure the bot is running.');
+        cleanup();
+      }
+    }
+
+    function showResult(type, icon, title, msg) {
+      const box = document.getElementById('resultBox');
+      box.className = `result ${type}`;
+      document.getElementById('resultIcon').textContent = icon;
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('resultMsg').textContent = msg;
+      box.style.display = 'block';
+    }
+
+    function copyCode() {
+      const code = document.getElementById('codeText').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const badge = document.getElementById('copiedBadge');
+        badge.style.display = 'block';
+        setTimeout(() => badge.style.display = 'none', 2000);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('numInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') getPairCode();
+      });
+      setTimeout(() => {
+        document.getElementById('startupNotif').classList.add('show');
+        setTimeout(() => document.getElementById('startupNotif').classList.remove('show'), 5500);
+      }, 800);
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mezuka MD V4 | Tharidu Gimhana 🕊️</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#4ecdc4;
+  --teal-d:#2bb5ab;
+  --teal-dd:#1a8f87;
+  --teal-l:#7eddd7;
+  --teal-xl:#b2ebe8;
+  --teal-bg:#e8faf9;
+  --teal-bg2:#f0fdfc;
+  --pink:#ff6b9d;
+  --pink-l:#ffb3cc;
+  --pink-bg:rgba(255,107,157,0.08);
+  --white:#fff;
+  --dark:#1a2e2e;
+  --dark2:#2a3d3d;
+  --gray:#6b8080;
+  --gray-l:#a0b8b8;
+  --gray-bg:#f5fafa;
+  --card-s:0 4px 24px rgba(78,205,196,0.13);
+  --card-sh:0 12px 40px rgba(78,205,196,0.25);
+  --green:#2ecc71;
+  --blue:#4da3ff;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--teal-bg2);
+  color:var(--dark);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* BG TEXTURE */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78,205,196,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255,107,157,0.07) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234ecdc4' fill-opacity='0.025'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* floating particles */
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;
+  border-radius:50%;
+  animation:floatUp linear infinite;
+  opacity:0;
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:0.4}
+  100%{transform:translateY(-10vh) scale(1);opacity:0}
+}
+
+/* ── OVERLAY ── */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0);pointer-events:none;transition:background 0.3s ease,backdrop-filter 0.3s ease;will-change:background}
+.overlay.open{background:rgba(0,0,0,0.38);pointer-events:auto;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+
+/* ── SIDE MENU ── */
+.side-menu{
+  position:fixed;top:0;left:0;bottom:0;z-index:100;width:280px;
+  background:rgba(240,252,251,0.97);
+  backdrop-filter:blur(32px) saturate(180%);-webkit-backdrop-filter:blur(32px) saturate(180%);
+  border-right:1px solid rgba(78,205,196,0.2);
+  box-shadow:8px 0 48px rgba(78,205,196,0.12);
+  transform:translate3d(-100%,0,0);
+  transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;overflow:hidden;will-change:transform;
+}
+.side-menu.open{transform:translate3d(0,0,0)}
+.sm-head{padding:32px 22px 20px;border-bottom:1px solid rgba(78,205,196,0.15);display:flex;align-items:center;gap:14px;position:relative}
+.sm-logo{width:46px;height:46px;border-radius:14px;overflow:hidden;border:1px solid rgba(78,205,196,0.3);box-shadow:0 6px 20px rgba(78,205,196,0.2);flex-shrink:0}
+.sm-logo img{width:100%;height:100%;object-fit:cover}
+.sm-brand{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.sm-title{font-size:17px;font-weight:800;letter-spacing:-0.4px;color:var(--dark)}
+.sm-close{position:absolute;top:18px;right:18px;width:30px;height:30px;border-radius:50%;background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);color:var(--gray);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.sm-close:hover{background:rgba(78,205,196,0.2);color:var(--dark)}
+.sm-nav{padding:16px 14px;flex:1;display:flex;flex-direction:column;gap:4px}
+.sm-btn{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:13px;background:none;border:none;width:100%;color:var(--gray);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:transform 0.18s,color 0.18s,background 0.18s;text-align:left;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.sm-btn:hover{background:rgba(78,205,196,0.1);color:var(--dark);transform:translate3d(3px,0,0)}
+.sm-btn:active{transform:translate3d(1px,0,0) scale(0.98)}
+.sm-btn .sm-ico{font-size:20px;width:26px;text-align:center}
+.sm-btn .sm-lbl{flex:1}
+.sm-btn .sm-arr{font-size:11px;color:var(--teal)}
+.sm-sep{height:1px;background:rgba(78,205,196,0.15);margin:8px 14px}
+.sm-footer{padding:16px 20px;border-top:1px solid rgba(78,205,196,0.15);text-align:center;font-size:9.5px;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+.sm-footer span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(78,205,196,0.18);
+  padding:0 16px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  box-shadow:0 2px 16px rgba(78,205,196,0.08);
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-img{width:28px;height:28px;border-radius:8px;overflow:hidden;border:1.5px solid rgba(78,205,196,0.3);box-shadow:0 4px 12px rgba(78,205,196,0.2);flex-shrink:0}
+.nav-logo-img img{width:100%;height:100%;object-fit:cover}
+.nav-brand{font-size:13px;font-weight:900;color:var(--dark);letter-spacing:-0.3px}
+.nav-brand span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-menu-btn{width:32px;height:32px;border-radius:9px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;transition:background 0.18s,transform 0.15s;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;margin-right:2px}
+.tb-menu-btn:hover{background:rgba(78,205,196,0.16)}
+.tb-menu-btn:active{transform:scale(0.93)}
+.tb-menu-btn span{display:block;width:14px;height:1.6px;background:var(--teal-d);border-radius:2px}
+.nav-back{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);font-size:11px;font-weight:700;color:var(--teal-d);cursor:pointer;transition:all 0.18s;font-family:'JetBrains Mono',monospace;letter-spacing:0.3px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.nav-back:hover{background:rgba(78,205,196,0.16);border-color:var(--teal)}
+
+/* ── PAGE WRAPPER ── */
+.page-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 22px 80px}
+
+/* ── HERO MEMORIAL ── */
+.hero{
+  position:relative;z-index:1;
+  padding:56px 0 40px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  animation:fadeUp 0.6s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* glow ring */
+.candle-ring{
+  position:relative;
+  width:130px;height:130px;
+  margin:0 auto 32px;
+  animation:fadeUp 0.8s ease 0.1s both;
+}
+.candle-ring::before{
+  content:'';
+  position:absolute;inset:-18px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(78,205,196,0.22) 0%,rgba(46,181,171,0.1) 40%,transparent 70%);
+  animation:glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse{
+  0%,100%{transform:scale(1);opacity:0.8}
+  50%{transform:scale(1.12);opacity:1}
+}
+.avatar-ring{
+  width:130px;height:130px;border-radius:50%;
+  border:2px solid rgba(78,205,196,0.4);
+  box-shadow:
+    0 0 30px rgba(78,205,196,0.3),
+    0 0 60px rgba(78,205,196,0.15),
+    0 8px 32px rgba(78,205,196,0.2);
+  overflow:hidden;
+  position:relative;z-index:1;
+  background:linear-gradient(145deg,var(--teal-bg),rgba(78,205,196,0.1));
+  display:flex;align-items:center;justify-content:center;
+  font-size:60px;
+}
+
+/* dove */
+.dove{
+  font-size:48px;
+  display:block;
+  margin:0 auto 6px;
+  animation:doveFly 4s ease-in-out infinite;
+  filter:drop-shadow(0 0 12px rgba(78,205,196,0.4));
+}
+@keyframes doveFly{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-10px) rotate(3deg)}
+}
+
+.memorial-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;
+  background:rgba(78,205,196,0.1);
+  border:1px solid rgba(78,205,196,0.3);
+  border-radius:100px;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--teal-d);font-family:'JetBrains Mono',monospace;
+  margin-bottom:22px;
+  animation:fadeUp 0.6s ease 0.2s both;
+}
+
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,8vw,62px);
+  font-weight:700;
+  font-style:italic;
+  letter-spacing:-1px;
+  line-height:1.05;
+  margin-bottom:10px;
+  background:linear-gradient(135deg,var(--teal) 0%,var(--teal-d) 35%,var(--pink) 80%,var(--teal-l) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeUp 0.7s ease 0.25s both;
+}
+.hero-dates{
+  font-size:12px;font-family:'JetBrains Mono',monospace;
+  color:var(--gray-l);letter-spacing:2px;
+  margin-bottom:28px;
+  animation:fadeUp 0.6s ease 0.3s both;
+}
+.hero-dates span{color:var(--teal-d);opacity:0.9}
+
+.rip-line{
+  font-size:17px;font-weight:300;font-style:italic;
+  font-family:'Playfair Display',serif;
+  color:var(--gray);
+  margin-bottom:0;
+  animation:fadeUp 0.6s ease 0.35s both;
+  letter-spacing:0.5px;
+}
+.rip-line em{color:var(--teal-d);font-style:italic}
+
+/* ── MEMORY SECTION ── */
+.memory-section{position:relative;z-index:1}
+
+.section-label{
+  text-align:center;font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--gray-l);font-family:'JetBrains Mono',monospace;margin-bottom:28px;
+}
+
+/* birthday note */
+.birthday-note{
+  background:rgba(78,205,196,0.06);
+  border:1px solid rgba(78,205,196,0.2);
+  border-radius:20px;
+  padding:22px;
+  margin:20px 0 16px;
+  display:flex;align-items:flex-start;gap:14px;
+  animation:fadeUp 0.6s ease 0.3s both;
+  box-shadow:var(--card-s);
+}
+.bn-ico{font-size:26px;flex-shrink:0;margin-top:2px}
+.bn-title{font-size:14px;font-weight:800;color:var(--teal-d);margin-bottom:6px;letter-spacing:-0.2px}
+.bn-text{font-size:13px;color:var(--gray);line-height:1.7}
+
+/* candle row */
+.candle-row{
+  display:flex;justify-content:center;align-items:flex-end;gap:16px;
+  margin:24px 0;
+}
+.candle{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  animation:candleAppear 0.5s ease both;
+}
+.candle:nth-child(1){animation-delay:0.1s}
+.candle:nth-child(2){animation-delay:0.2s}
+.candle:nth-child(3){animation-delay:0.3s}
+.candle:nth-child(4){animation-delay:0.4s}
+.candle:nth-child(5){animation-delay:0.5s}
+@keyframes candleAppear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.flame{
+  font-size:20px;
+  animation:flicker 1.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(255,180,0,0.7));
+}
+.candle:nth-child(2) .flame{animation-delay:0.3s}
+.candle:nth-child(3) .flame{animation-delay:0.6s}
+.candle:nth-child(4) .flame{animation-delay:0.9s}
+.candle:nth-child(5) .flame{animation-delay:1.2s}
+@keyframes flicker{
+  0%,100%{transform:scale(1) rotate(-2deg);filter:drop-shadow(0 0 6px rgba(255,180,0,0.7))}
+  25%{transform:scale(1.05) rotate(2deg);filter:drop-shadow(0 0 10px rgba(255,200,0,0.9))}
+  50%{transform:scale(0.95) rotate(-3deg);filter:drop-shadow(0 0 4px rgba(255,150,0,0.5))}
+  75%{transform:scale(1.08) rotate(1deg);filter:drop-shadow(0 0 8px rgba(255,190,0,0.8))}
+}
+.candle-body{
+  width:12px;height:36px;
+  border-radius:3px 3px 2px 2px;
+  background:linear-gradient(180deg,#f5e0a0,#c8a060);
+  box-shadow:inset -2px 0 4px rgba(0,0,0,0.2);
+}
+.candle:nth-child(odd) .candle-body{height:42px}
+
+/* quote card */
+.quote-card{
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:22px;
+  padding:28px 26px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+  animation:fadeUp 0.6s ease both;
+  box-shadow:var(--card-s);
+}
+.quote-card::before{
+  content:'"';
+  position:absolute;top:-10px;left:16px;
+  font-size:120px;font-family:'Playfair Display',serif;
+  color:rgba(78,205,196,0.08);line-height:1;pointer-events:none;
+}
+.quote-card::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  border-radius:4px 0 0 4px;
+  background:linear-gradient(180deg,var(--teal),var(--pink));
+}
+.quote-text{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:16px;
+  color:var(--dark2);
+  line-height:1.75;
+  position:relative;z-index:1;
+}
+.quote-attr{
+  margin-top:12px;font-size:10px;
+  color:var(--teal-d);
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;
+  text-transform:uppercase;
+  font-weight:700;
+}
+
+/* memory grid */
+.memory-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+.mem-box{
+  background:white;
+  border:1px solid rgba(78,205,196,0.15);
+  border-radius:18px;
+  padding:20px 16px;
+  text-align:center;
+  animation:fadeUp 0.5s ease both;
+  box-shadow:var(--card-s);
+  transition:all 0.22s;
+}
+.mem-box:hover{transform:translateY(-3px);box-shadow:var(--card-sh)}
+.mem-ico{font-size:28px;margin-bottom:8px;display:block}
+.mem-title{font-size:13px;font-weight:800;color:var(--dark);margin-bottom:4px;letter-spacing:-0.2px}
+.mem-desc{font-size:11px;color:var(--gray);line-height:1.5;font-family:'JetBrains Mono',monospace}
+
+/* dedication */
+.dedication{
+  text-align:center;
+  padding:24px 0 10px;
+}
+.ded-emoji{font-size:32px;display:block;margin-bottom:12px;animation:doveFly 4s ease-in-out infinite}
+.ded-text{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:16px;
+  color:var(--gray);
+  line-height:1.8;
+}
+.ded-name{
+  margin-top:12px;font-size:10px;
+  color:var(--teal-d);
+  font-family:'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase;
+  font-weight:700;
+}
+
+/* ── FOOTER ── */
+.footer{
+  border-top:1px solid rgba(78,205,196,0.15);
+  padding:32px 0 0;text-align:center;
+  position:relative;z-index:1;
+  margin-top:40px;
+}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+.footer-logo-ico{width:32px;height:32px;border-radius:10px;overflow:hidden;border:1px solid rgba(78,205,196,0.2)}
+.footer-logo-ico img{width:100%;height:100%;object-fit:cover}
+.footer-name{font-size:14px;font-weight:900;color:var(--dark)}
+.footer-text{font-size:11px;color:var(--gray-l);font-family:'JetBrains Mono',monospace;line-height:2}
+.footer-text span{background:linear-gradient(135deg,var(--teal-d),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.footer-copy{margin-top:16px;padding:16px 0;border-top:1px solid rgba(78,205,196,0.1);font-size:10.5px;color:var(--gray-l);font-family:'JetBrains Mono',monospace}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--teal-bg2)}
+::-webkit-scrollbar-thumb{background:var(--teal-xl);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+
+@media(max-width:440px){
+  .memory-grid{grid-template-columns:1fr}
+  .page-wrap{padding:0 16px 60px}
+}
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<!-- SIDE MENU -->
+<nav class="side-menu" id="sideMenu">
+  <div class="sm-head">
+    <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+    <div>
+      <div class="sm-brand">Black Cat Ofc</div>
+      <div class="sm-title">Mezuka MD V4</div>
+    </div>
+    <button class="sm-close" onclick="closeMenu()">✕</button>
+  </div>
+  <div class="sm-nav">
+    <button class="sm-btn" onclick="navigate('main.html')">
+      <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('pair.html')">
+      <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('settings.html')">
+      <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('react.html')">
+      <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('shop.html')">
+      <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('team.html')">
+      <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+    </button>
+    <button class="sm-btn" onclick="navigate('contact.html')">
+      <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+    </button>
+    <div class="sm-sep"></div>
+    <button class="sm-btn" onclick="navigate('tharidu.html')" style="background:rgba(78,205,196,0.1);color:var(--teal-d)">
+      <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+    </button>
+  </div>
+  <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+</nav>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="nav-logo-img"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="Mezuka"></div>
+    <div class="nav-brand">Mezuka MD <span>V4</span></div>
+  </div>
+  <a class="nav-back" href="main.html">← Back</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <div class="candle-ring">
+      <div class="avatar-ring">🕊️</div>
+    </div>
+
+    <div class="memorial-tag">🕯️ In Loving Memory</div>
+
+    <h1 class="hero-name">Tharidu Gimhana</h1>
+
+    <div class="hero-dates">
+      <span>March 7, 2007</span> &nbsp;·&nbsp; Forever in our hearts
+    </div>
+
+    <p class="rip-line">
+      The best friend anyone could ever ask for.<br>
+      <em>Gone too soon, never forgotten.</em>
+    </p>
+
+  </section>
+
+  <!-- MEMORY SECTION -->
+  <div class="memory-section">
+
+    <!-- birthday note -->
+    <div class="birthday-note">
+      <div class="bn-ico">🎂</div>
+      <div class="bn-body">
+        <div class="bn-title">Happy Birthday, Tharidu 🕊️</div>
+        <div class="bn-text">
+          Today — March 7th — would have been your birthday. You would have turned 19 this year.<br><br>
+          Mezuka MD V4 was built on this day, just for you. Every line of code carries your name in it. This bot exists because of you, and it always will.
+        </div>
+      </div>
+    </div>
+
+    <!-- candles -->
+    <div class="candle-row">
+      <div class="candle"><div class="flame">🔥</div><div class="candle-body"></div></div>
+      <div class="candle"><div class="flame">🔥</div><div class="candle-body"></div></div>
+      <div class="candle"><div class="flame">🔥</div><div class="candle-body"></div></div>
+      <div class="candle"><div class="flame">🔥</div><div class="candle-body"></div></div>
+      <div class="candle"><div class="flame">🔥</div><div class="candle-body"></div></div>
+    </div>
+
+    <!-- quote -->
+    <div class="quote-card" style="animation-delay:0.1s">
+      <div class="quote-text">
+        "He was not just a friend. He was my best friend — the kind you only get once in life.
+        Three years ago, he left this world, but he never left my heart.
+        This entire project is dedicated to him."
+      </div>
+      <div class="quote-attr">— Nimeshka Mihiran, developer of Mezuka MD V4</div>
+    </div>
+
+    <!-- memory grid -->
+    <div class="section-label" style="margin-top:28px">Who was Tharidu?</div>
+    <div class="memory-grid">
+      <div class="mem-box" style="animation-delay:0.05s">
+        <span class="mem-ico">💙</span>
+        <div class="mem-title">Best Friend</div>
+        <div class="mem-desc">The closest friend Nimeshka ever had. Loyal, kind, and always there.</div>
+      </div>
+      <div class="mem-box" style="animation-delay:0.12s">
+        <span class="mem-ico">😂</span>
+        <div class="mem-title">Full of Life</div>
+        <div class="mem-desc">He brought laughter and energy wherever he went.</div>
+      </div>
+      <div class="mem-box" style="animation-delay:0.19s">
+        <span class="mem-ico">🕊️</span>
+        <div class="mem-title">Gone Too Soon</div>
+        <div class="mem-desc">Taken from us 3 years ago. A loss that words cannot describe.</div>
+      </div>
+      <div class="mem-box" style="animation-delay:0.26s">
+        <span class="mem-ico">✨</span>
+        <div class="mem-title">Forever Here</div>
+        <div class="mem-desc">His spirit lives on in every version of this bot — forever.</div>
+      </div>
+    </div>
+
+    <!-- dedication -->
+    <div class="dedication" style="margin-top:10px">
+      <span class="ded-emoji">🕊️</span>
+      <div class="ded-text">
+        "Fly free, Tharidu.<br>
+        The stars shine a little brighter<br>
+        because you are among them."
+      </div>
+      <div class="ded-name" style="margin-top:16px">Rest in Peace · 2007 – 2022</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <div class="footer-logo-ico"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+      <div class="footer-name">Mezuka MD V4</div>
+    </div>
+    <div class="footer-text">
+      Powered by <span>Mezuka MD V4</span> · Owner: <span>Nimeshka Mihiran</span><br>
+      Dedicated to <span>Tharidu Gimhana</span> · rest in peace 🕊️
+    </div>
+    <div class="footer-copy">© 2025 Black Cat Ofc · Mezuka MD V4</div>
+  </footer>
+
+</div>
+
+<script>
+  // ── PARTICLES ──
+  const container = document.getElementById('particles');
+  const colors = ['rgba(78,205,196,0.4)','rgba(46,181,171,0.3)','rgba(255,107,157,0.2)','rgba(78,205,196,0.6)'];
+  for(let i = 0; i < 20; i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*14+10}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+
+  // ── MENU ──
+  let menuOpen = false;
+  let touchStartX = 0;
+  function openMenu(){
+    if(menuOpen) return;
+    menuOpen=true;
+    requestAnimationFrame(()=>{
+      document.getElementById('sideMenu').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow='hidden';
+    });
+  }
+  function closeMenu(){
+    if(!menuOpen) return;
+    menuOpen=false;
+    requestAnimationFrame(()=>{
+      document.getElementById('sideMenu').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow='';
+    });
+  }
+  function navigate(page){
+    closeMenu();
+    setTimeout(()=>window.location.href=page,180);
+  }
+  document.getElementById('sideMenu').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
+  document.getElementById('sideMenu').addEventListener('touchend',e=>{if(e.changedTouches[0].clientX-touchStartX<-60)closeMenu()},{passive:true});
+  document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',e=>{if(touchStartX<24&&e.changedTouches[0].clientX-touchStartX>60)openMenu()},{passive:true});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+</script>
+</body>
+</html>

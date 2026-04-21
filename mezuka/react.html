@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Auto React | Mezuka MD V4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --teal: #4ecdc4;
+            --teal-d: #2bb5ab;
+            --pink: #ff6b9d;
+            --dark: #1a2e2e;
+            --gray: #6b8080;
+            --white: #fff;
+            --teal-bg: #e8faf9;
+            --card-s: 0 4px 24px rgba(78,205,196,0.13);
+            --card-sh: 0 12px 40px rgba(78,205,196,0.25);
+        }
+
+        /* ── OVERLAY ── */
+        .overlay { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0); pointer-events: none; transition: background 0.3s ease, backdrop-filter 0.3s ease; will-change: background; }
+        .overlay.open { background: rgba(0,0,0,0.38); pointer-events: auto; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
+        /* ── SIDE MENU ── */
+        .side-menu {
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; width: 280px;
+            background: rgba(240,252,251,0.97); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%);
+            border-right: 1px solid rgba(78,205,196,0.2); box-shadow: 8px 0 48px rgba(78,205,196,0.12);
+            transform: translate3d(-100%,0,0); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column; overflow: hidden; will-change: transform;
+        }
+        .side-menu.open { transform: translate3d(0,0,0); }
+        .sm-head { padding: 32px 22px 20px; border-bottom: 1px solid rgba(78,205,196,0.15); display: flex; align-items: center; gap: 14px; position: relative; }
+        .sm-logo { width: 46px; height: 46px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(78,205,196,0.3); box-shadow: 0 6px 20px rgba(78,205,196,0.2); flex-shrink: 0; }
+        .sm-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .sm-brand { font-size: 9.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 2px; }
+        .sm-title { font-size: 17px; font-weight: 800; letter-spacing: -0.4px; color: var(--dark); }
+        .sm-close { position: absolute; top: 18px; right: 18px; width: 30px; height: 30px; border-radius: 50%; background: rgba(78,205,196,0.1); border: 1px solid rgba(78,205,196,0.2); color: var(--gray); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+        .sm-close:hover { background: rgba(78,205,196,0.2); color: var(--dark); }
+        .sm-nav { padding: 16px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sm-btn { display: flex; align-items: center; gap: 13px; padding: 13px 14px; border-radius: 13px; background: none; border: none; width: 100%; color: var(--gray); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.18s, color 0.18s, background 0.18s; text-align: left; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .sm-btn:hover { background: rgba(78,205,196,0.1); color: var(--dark); transform: translate3d(3px,0,0); }
+        .sm-btn .sm-ico { font-size: 20px; width: 26px; text-align: center; }
+        .sm-btn .sm-lbl { flex: 1; }
+        .sm-btn .sm-arr { font-size: 11px; color: var(--teal); }
+        .sm-sep { height: 1px; background: rgba(78,205,196,0.15); margin: 8px 14px; }
+        .sm-footer { padding: 16px 20px; border-top: 1px solid rgba(78,205,196,0.15); text-align: center; font-size: 9.5px; color: var(--gray-l); font-family: 'JetBrains Mono', monospace; }
+        .sm-footer span { background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; }
+
+        .nav {
+            position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(78,205,196,0.18);
+            padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            box-shadow: 0 2px 16px rgba(78,205,196,0.08);
+        }
+        .tb-menu-btn { width: 32px; height: 32px; border-radius: 9px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; transition: background 0.18s, transform 0.15s; flex-shrink: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; margin-right: 2px; }
+        .tb-menu-btn span { display: block; width: 14px; height: 1.6px; background: var(--teal-d); border-radius: 2px; }
+        .nav-back { display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 100px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2); font-size: 11px; font-weight: 700; color: var(--teal-d); cursor: pointer; transition: all 0.18s; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px; text-decoration: none; white-space: nowrap; flex-shrink: 0; }
+
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-brand { font-size: 16px; font-weight: 900; }
+        .nav-brand span { background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; position: relative; z-index: 1; }
+
+        .dashboard { display: none; flex-direction: column; gap: 24px; animation: fadeIn 0.5s ease both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-card {
+            background: white; border-radius: 24px; padding: 30px; border: 1px solid rgba(78,205,196,0.15);
+            box-shadow: var(--card-s); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+        }
+        .user-info h2 { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+        .user-info p { color: var(--gray); font-size: 14px; }
+        .coin-box {
+            background: linear-gradient(135deg, var(--teal), var(--teal-d)); color: white;
+            padding: 12px 24px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 8px 24px rgba(78,205,196,0.3);
+        }
+        .coin-val { font-size: 28px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+        .coin-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 24px; padding: 30px; border: 1px solid rgba(78,205,196,0.15); box-shadow: var(--card-s); }
+        .card-h { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; font-weight: 700; color: var(--gray); margin-bottom: 8px; }
+        input, select {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(78,205,196,0.2);
+            background: var(--teal-bg); font-family: 'Nunito', sans-serif; outline: none; transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--teal); }
+        .btn-submit {
+            width: 100%; padding: 16px; border-radius: 16px; border: none;
+            background: linear-gradient(135deg, var(--teal), var(--teal-d)); color: white;
+            font-size: 15px; font-weight: 800; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(78,205,196,0.3); margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(78,205,196,0.4); }
+
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
+        .task-item {
+            background: var(--teal-bg); border-radius: 16px; padding: 16px 20px;
+            display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(78,205,196,0.1);
+        }
+        .task-info h4 { font-size: 14px; font-weight: 800; }
+        .task-info p { font-size: 11px; color: var(--gray); margin-top: 2px; }
+        .task-expiry { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--pink); }
+
+        /* AUTH SECT */
+        .auth-card {
+            max-width: 400px; margin: 60px auto; background: white; border-radius: 28px; padding: 40px;
+            border: 1px solid rgba(78,205,196,0.2); box-shadow: var(--card-sh); text-align: center;
+        }
+        .auth-ico { font-size: 48px; margin-bottom: 20px; }
+        .auth-title { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+        .auth-sub { font-size: 14px; color: var(--gray); margin-bottom: 30px; }
+        .auth-switch { margin-top: 20px; font-size: 13px; color: var(--gray); cursor: pointer; }
+        .auth-switch span { color: var(--teal-d); font-weight: 800; }
+
+        #logout-btn { background: none; border: 1.5px solid rgba(255, 107, 157, 0.3); color: var(--pink); padding: 8px 16px; border-radius: 100px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        #logout-btn:hover { background: rgba(255, 107, 157, 0.1); border-color: var(--pink); }
+
+        /* TOAST */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1a2e2e; color: white; padding: 12px 24px; border-radius: 100px; font-size: 13px; font-weight: 600; z-index: 1000; transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <nav class="side-menu" id="sideMenu">
+        <div class="sm-head">
+            <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+            <div>
+                <div class="sm-brand">Black Cat Ofc</div>
+                <div class="sm-title">Mezuka MD V4</div>
+            </div>
+            <button class="sm-close" onclick="closeMenu()">✕</button>
+        </div>
+        <div class="sm-nav">
+            <button class="sm-btn" onclick="navigate('main.html')">
+                <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('pair.html')">
+                <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('settings.html')">
+                <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('react.html')" style="background:rgba(78,205,196,0.1);color:var(--teal-d)">
+                <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('shop.html')">
+                <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('team.html')">
+                <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('contact.html')">
+                <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('tharidu.html')">
+                <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+            </button>
+        </div>
+        <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+    </nav>
+
+    <nav class="nav">
+        <div class="nav-logo">
+            <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+            <img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo" style="width:28px;height:28px;border-radius:8px;border:1.5px solid rgba(78,205,196,0.3);">
+            <div class="nav-brand">Mezuka MD <span>V4</span></div>
+        </div>
+        <div id="nav-actions">
+            <button id="logout-btn" onclick="logout()" style="display:none">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- AUTH SECTION -->
+        <div id="auth-sect">
+            <div class="auth-card">
+                <div class="auth-ico">🤖</div>
+                <h1 class="auth-title" id="auth-header">React Login</h1>
+                <p class="auth-sub" id="auth-desc">Enter your bot number and settings password to manage auto-reactions.</p>
+                
+                <div class="form-group" id="user-group" style="display:none">
+                    <label>Username</label>
+                    <input type="text" id="auth-user" placeholder="e.g. Nimesh">
+                </div>
+                <div class="form-group">
+                    <label>Bot Number</label>
+                    <input type="text" id="auth-number" placeholder="94721584279">
+                </div>
+                <div class="form-group">
+                    <label>Settings Password</label>
+                    <input type="password" id="auth-pass" placeholder="••••••••">
+                </div>
+                
+                <button class="btn-submit" id="auth-btn" onclick="handleAuth()">Login Now</button>
+                
+                <div class="auth-switch" onclick="toggleAuthMode()">
+                    <span id="switch-text">New here? <span>Signup for 10 Free Coins</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dash-sect" class="dashboard">
+            
+            <div class="user-card">
+                <div class="user-info">
+                    <h2 id="user-name-display">Welcome Back!</h2>
+                    <p id="user-num-display">947********</p>
+                </div>
+                <div class="coin-box">
+                    <div>
+                        <div class="coin-val" id="coin-display">0</div>
+                        <div class="coin-label">Coins Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY CLAIM CARD -->
+            <div class="card" style="background: linear-gradient(135deg, #fff9e6, #fff3cc); border: 1.5px solid rgba(255,193,7,0.3); box-shadow: 0 4px 24px rgba(255,193,7,0.13);">
+                <div class="card-h"><span>🎁</span> Daily Coin Claim</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                        <p style="font-size:14px; color:var(--gray); margin-bottom:4px;">දිනකට <strong style="color:#b8860b;">+5 Coins</strong> free claim කරන්න!</p>
+                        <p id="claim-status-text" style="font-size:12px; color:var(--gray);">Loading...</p>
+                    </div>
+                    <button id="daily-claim-btn" onclick="claimDailyCoins()"
+                        style="padding:12px 28px; border-radius:14px; border:none;
+                               background: linear-gradient(135deg, #ffd700, #ffa500);
+                               color:#7a4f00; font-size:14px; font-weight:800; cursor:pointer;
+                               box-shadow:0 6px 18px rgba(255,193,7,0.35); transition:transform 0.2s, box-shadow 0.2s;">
+                        🪙 Claim 5 Coins
+                    </button>
+                </div>
+            </div>
+
+            <!-- REDEEM CODE CARD -->
+            <div class="card" style="background: linear-gradient(135deg, #f0f0ff, #e8e8ff); border: 1.5px solid rgba(138,99,210,0.25); box-shadow: 0 4px 24px rgba(138,99,210,0.1);">
+                <div class="card-h"><span>🎟️</span> Redeem Code</div>
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <input type="text" id="redeem-input" placeholder="Enter redeem code (e.g. MEZUKA50)"
+                        style="flex:1; min-width:180px; background:#fff; border:1.5px solid rgba(138,99,210,0.25); text-transform:uppercase; letter-spacing:1px; font-weight:700; font-family:'JetBrains Mono',monospace;">
+                    <button id="redeem-btn" onclick="redeemCodeNow()"
+                        style="padding:14px 28px; border-radius:14px; border:none;
+                               background: linear-gradient(135deg, #a78bfa, #7c3aed);
+                               color:#fff; font-size:14px; font-weight:800; cursor:pointer;
+                               box-shadow:0 6px 18px rgba(124,58,237,0.35); transition:transform 0.2s, box-shadow 0.2s; white-space:nowrap;">
+                        🎟️ Redeem
+                    </button>
+                </div>
+                <p style="font-size:11px; color:#7c3aed; margin-top:12px; font-weight:600;">
+                    💡 Redeem codes danna Mezuka MD official channels follow karanna!
+                </p>
+            </div>
+
+            <div class="action-grid">
+                <!-- SETUP REACT -->
+                <div class="card">
+                    <div class="card-h"><span>⚡</span> Setup Auto React</div>
+                    <div class="form-group">
+                        <label>Channel Link or JID</label>
+                        <input type="text" id="react-jid" placeholder="Paste Link or ID (e.g. 120363...)">
+                    </div>
+                    <div class="form-group">
+                        <label>Emojis (comma separated)</label>
+                        <input type="text" id="react-emojis" placeholder="❤️, 🔥, 😍, 💯">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (10 Coins / Day)</label>
+                        <select id="react-days">
+                            <option value="1">1 Day - 10 Coins</option>
+                            <option value="2">2 Days - 20 Coins</option>
+                            <option value="3">3 Days - 30 Coins</option>
+                            <option value="7">7 Days - 70 Coins</option>
+                            <option value="30">30 Days - 300 Coins</option>
+                        </select>
+                    </div>
+                    <button class="btn-submit" onclick="addReactTask()">Activate Now</button>
+                    <p style="font-size: 11px; text-align: center; margin-top: 15px; color: var(--gray);">Need more coins? <a href="/shop.html" style="color: var(--teal-d); font-weight: 800; text-decoration: none;">Visit Shop</a></p>
+                </div>
+
+                <!-- ACTIVE TASKS -->
+                <div class="card">
+                    <div class="card-h"><span>📌</span> Active Channels</div>
+                    <div id="no-tasks" style="text-align:center; padding:20px; color:var(--gray); display:none;">
+                        <div style="font-size:32px; margin-bottom:10px;">🎐</div>
+                        <p style="font-size:13px">No active reaction tasks.</p>
+                    </div>
+                    <div id="task-list" class="task-list">
+                        <!-- Tasks go here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="toast">Message here</div>
+
+    <script>
+        let isSignup = false;
+        let currentUser = null;
+
+        function toggleAuthMode() {
+            isSignup = !isSignup;
+            document.getElementById('user-group').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('auth-header').innerText = isSignup ? 'Create Account' : 'React Login';
+            document.getElementById('auth-desc').innerText = isSignup ? 'Sign up once to get 10 free coins to start!' : 'Enter your bot number and settings password to manage auto-reactions.';
+            document.getElementById('auth-btn').innerText = isSignup ? 'Sign Up' : 'Login Now';
+            document.getElementById('switch-text').innerHTML = isSignup ? 'Already have account? <span>Login</span>' : 'New here? <span>Signup for 10 Free Coins</span>';
+        }
+
+        async function handleAuth() {
+            const number = document.getElementById('auth-number').value.trim();
+            const password = document.getElementById('auth-pass').value.trim();
+            const username = document.getElementById('auth-user').value.trim();
+
+            if(!number || !password) return showToast("Please fill all fields");
+
+            try {
+                const res = await fetch('/api/react/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number, password, username })
+                });
+                const data = await res.json();
+                
+                if(data.ok) {
+                    currentUser = { number, password, username: data.username || username };
+                    saveUser();
+                    initDashboard(data);
+                    showToast(data.firstTime ? "Welcome! 10 Free Coins Added!" : "Login successful");
+                } else {
+                    showToast("Error: " + data.error);
+                }
+            } catch(e) { showToast("Connection error"); }
+        }
+
+        function saveUser() {
+            localStorage.setItem('mezuka_react_user', JSON.stringify(currentUser));
+        }
+
+        function loadUser() {
+            const saved = localStorage.getItem('mezuka_react_user');
+            if(saved) {
+                currentUser = JSON.parse(saved);
+                handleAuth(); // Auto login
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('mezuka_react_user');
+            location.reload();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function initDashboard(data) {
+            document.getElementById('auth-sect').style.display = 'none';
+            document.getElementById('dash-sect').style.display = 'flex';
+            document.getElementById('logout-btn').style.display = 'block';
+            
+            document.getElementById('user-name-display').innerText = "Hello, " + (data.username || currentUser.username) + "!";
+            document.getElementById('user-num-display').innerText = currentUser.number;
+            document.getElementById('coin-display').innerText = data.coins || 0;
+            
+            fetchTasks();
+        }
+
+        async function redeemCodeNow() {
+            const code = document.getElementById('redeem-input').value.trim().toUpperCase();
+            if (!code) return showToast('Please enter a redeem code');
+
+            const btn = document.getElementById('redeem-btn');
+            btn.disabled = true;
+            btn.innerText = '⏳ Checking...';
+
+            try {
+                const res = await fetch('/api/react/redeem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: currentUser.number, password: currentUser.password, code })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast(`🎉 +${data.awarded} Coins! Code "${data.code}" redeemed!`);
+                    document.getElementById('coin-display').innerText = data.coins;
+                    document.getElementById('redeem-input').value = '';
+                } else {
+                    showToast('❌ ' + data.error);
+                }
+            } catch(e) {
+                showToast('Request failed');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🎟️ Redeem';
+            }
+        }
+
+        async function claimDailyCoins() {
+            const btn = document.getElementById('daily-claim-btn');
+            btn.disabled = true;
+            btn.innerText = '⏳ Claiming...';
+            try {
+                const res = await fetch('/api/react/daily-claim', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: currentUser.number, password: currentUser.password })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast(`🎉 +5 Coins Claimed! Total: ${data.coins} coins`);
+                    document.getElementById('coin-display').innerText = data.coins;
+                    document.getElementById('claim-status-text').innerText = '✅ Claimed today! Come back tomorrow.';
+                    btn.innerText = '✅ Claimed';
+                    btn.style.background = 'linear-gradient(135deg, #ccc, #aaa)';
+                    btn.style.color = '#666';
+                } else {
+                    showToast('⏰ ' + data.error);
+                    document.getElementById('claim-status-text').innerText = '⏰ ' + data.error;
+                    btn.innerText = '⏰ Already Claimed';
+                    btn.style.background = 'linear-gradient(135deg, #ccc, #aaa)';
+                    btn.style.color = '#666';
+                }
+            } catch(e) {
+                showToast('Request failed');
+                btn.disabled = false;
+                btn.innerText = '🪙 Claim 5 Coins';
+            }
+        }
+
+        async function refreshUser() {
+            try {
+                const res = await fetch('/api/react/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: currentUser.number, password: currentUser.password })
+                });
+                const data = await res.json();
+                if(data.ok) {
+                    document.getElementById('coin-display').innerText = data.coins;
+                }
+            } catch(e) {}
+        }
+
+        async function addReactTask() {
+            const jid = document.getElementById('react-jid').value.trim();
+            const emojis = document.getElementById('react-emojis').value.trim();
+            const days = document.getElementById('react-days').value;
+
+            if(!jid) return showToast("Enter JID or Link");
+
+            try {
+                const res = await fetch('/api/react/add-task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        number: currentUser.number, 
+                        password: currentUser.password,
+                        jid, emojis, days 
+                    })
+                });
+                const data = await res.json();
+                if(data.ok) {
+                    showToast("Activated successfully!");
+                    document.getElementById('react-jid').value = "";
+                    refreshUser();
+                    fetchTasks();
+                } else {
+                    showToast("Error: " + data.error);
+                }
+            } catch(e) { showToast("Request failed"); }
+        }
+
+        async function fetchTasks() {
+            try {
+                const res = await fetch('/api/react/list-tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        number: currentUser.number, 
+                        password: currentUser.password
+                    })
+                });
+                const data = await res.json();
+                if(data.ok) {
+                    renderTasks(data.tasks);
+                }
+            } catch(e) {}
+        }
+
+        function renderTasks(tasks) {
+            const list = document.getElementById('task-list');
+            const empty = document.getElementById('no-tasks');
+            list.innerHTML = "";
+            
+            if(!tasks || tasks.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            tasks.forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                
+                const expDate = new Date(t.expiryDate);
+                const timeLeft = Math.max(0, Math.ceil((expDate - new Date()) / (1000 * 60 * 60 * 24)));
+                
+                item.innerHTML = `
+                    <div class="task-info">
+                        <h4>${t.jid.split('@')[0]}</h4>
+                        <p>${t.emojis.length > 0 ? t.emojis.slice(0, 5).join(' ') + (t.emojis.length > 5 ? '...' : '') : '(Default Emojis)'}</p>
+                    </div>
+                    <div class="task-expiry">${timeLeft} Days Left</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if(!t) {
+                // If no toast element, just alert
+                alert(msg);
+                return;
+            }
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        /* ── SIDE MENU LOGIC ── */
+        let menuOpen = false;
+        function openMenu(){
+            if(menuOpen) return;
+            menuOpen = true;
+            document.getElementById('sideMenu').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+            document.body.style.overflow='hidden';
+        }
+        function closeMenu(){
+            if(!menuOpen) return;
+            menuOpen = false;
+            document.getElementById('sideMenu').classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+            document.body.style.overflow='';
+        }
+        function navigate(page){
+            closeMenu();
+            setTimeout(()=>window.location.href=page, 180);
+        }
+
+        // Auto load - restore saved session
+        const saved = localStorage.getItem('mezuka_react_user');
+        if(saved) {
+            try {
+                currentUser = JSON.parse(saved);
+                // Pre-fill fields so handleAuth() can read them
+                document.getElementById('auth-number').value = currentUser.number || '';
+                document.getElementById('auth-pass').value = currentUser.password || '';
+                document.getElementById('auth-user').value = currentUser.username || '';
+                handleAuth();
+            } catch(e) {
+                localStorage.removeItem('mezuka_react_user');
+            }
+        }
+    </script>
+
+</body>
+</html>

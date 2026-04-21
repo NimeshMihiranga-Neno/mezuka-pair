@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Shop | Mezuka MD V4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --teal: #4ecdc4;
+            --teal-d: #2bb5ab;
+            --pink: #ff6b9d;
+            --dark: #1a2e2e;
+            --gray: #6b8080;
+            --white: #fff;
+            --teal-bg: #e8faf9;
+            --card-s: 0 4px 24px rgba(78,205,196,0.13);
+            --card-sh: 0 12px 40px rgba(78,205,196,0.25);
+        }
+
+        /* ── OVERLAY ── */
+        .overlay { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0); pointer-events: none; transition: background 0.3s ease, backdrop-filter 0.3s ease; will-change: background; }
+        .overlay.open { background: rgba(0,0,0,0.38); pointer-events: auto; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
+        /* ── SIDE MENU ── */
+        .side-menu {
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; width: 280px;
+            background: rgba(240,252,251,0.97); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%);
+            border-right: 1px solid rgba(78,205,196,0.2); box-shadow: 8px 0 48px rgba(78,205,196,0.12);
+            transform: translate3d(-100%,0,0); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column; overflow: hidden; will-change: transform;
+        }
+        .side-menu.open { transform: translate3d(0,0,0); }
+        .sm-head { padding: 32px 22px 20px; border-bottom: 1px solid rgba(78,205,196,0.15); display: flex; align-items: center; gap: 14px; position: relative; }
+        .sm-logo { width: 46px; height: 46px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(78,205,196,0.3); box-shadow: 0 6px 20px rgba(78,205,196,0.2); flex-shrink: 0; }
+        .sm-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .sm-brand { font-size: 9.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 2px; }
+        .sm-title { font-size: 17px; font-weight: 800; letter-spacing: -0.4px; color: var(--dark); }
+        .sm-close { position: absolute; top: 18px; right: 18px; width: 30px; height: 30px; border-radius: 50%; background: rgba(78,205,196,0.1); border: 1px solid rgba(78,205,196,0.2); color: var(--gray); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+        .sm-close:hover { background: rgba(78,205,196,0.2); color: var(--dark); }
+        .sm-nav { padding: 16px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sm-btn { display: flex; align-items: center; gap: 13px; padding: 13px 14px; border-radius: 13px; background: none; border: none; width: 100%; color: var(--gray); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.18s, color 0.18s, background 0.18s; text-align: left; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .sm-btn:hover { background: rgba(78,205,196,0.1); color: var(--dark); transform: translate3d(3px,0,0); }
+        .sm-btn .sm-ico { font-size: 20px; width: 26px; text-align: center; }
+        .sm-btn .sm-lbl { flex: 1; }
+        .sm-btn .sm-arr { font-size: 11px; color: var(--teal); }
+        .sm-sep { height: 1px; background: rgba(78,205,196,0.15); margin: 8px 14px; }
+        .sm-footer { padding: 16px 20px; border-top: 1px solid rgba(78,205,196,0.15); text-align: center; font-size: 9.5px; color: var(--gray-l); font-family: 'JetBrains Mono', monospace; }
+        .sm-footer span { background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; }
+
+        .nav {
+            position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(78,205,196,0.18);
+            padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            box-shadow: 0 2px 16px rgba(78,205,196,0.08);
+        }
+        .tb-menu-btn { width: 32px; height: 32px; border-radius: 9px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer; transition: background 0.18s, transform 0.15s; flex-shrink: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; margin-right: 2px; }
+        .tb-menu-btn span { display: block; width: 14px; height: 1.6px; background: var(--teal-d); border-radius: 2px; }
+        .nav-back { display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 100px; background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2); font-size: 11px; font-weight: 700; color: var(--teal-d); cursor: pointer; transition: all 0.18s; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px; text-decoration: none; white-space: nowrap; flex-shrink: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #f0fdfc;
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(78,205,196,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse 50% 60% at 90% 100%, rgba(255,107,157,0.07) 0%, transparent 55%);
+        }
+        .nav {
+            position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(78,205,196,0.18);
+            padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-brand { font-size: 16px; font-weight: 900; }
+        .nav-brand span { background: linear-gradient(135deg, var(--teal-d), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .container { max-width: 1000px; margin: 60px auto; padding: 0 20px; position: relative; z-index: 1; text-align: center; }
+
+        .shop-header { margin-bottom: 50px; animation: fadeIn 0.6s ease both; }
+        .shop-header h1 { font-size: 42px; font-weight: 1000; letter-spacing: -1.5px; margin-bottom: 10px; }
+        .shop-header p { color: var(--gray); font-size: 16px; max-width: 500px; margin: 0 auto; }
+
+        .packages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; animation: fadeIn 0.8s ease both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .pkg-card {
+            background: white; border-radius: 28px; padding: 40px 30px; border: 1px solid rgba(78,205,196,0.15);
+            box-shadow: var(--card-s); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+        }
+        .pkg-card:hover { transform: translateY(-8px); box-shadow: var(--card-sh); border-color: var(--teal); }
+        .pkg-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--teal), var(--pink));
+        }
+
+        .pkg-ico { font-size: 40px; margin-bottom: 20px; }
+        .pkg-name { font-size: 16px; font-weight: 800; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .pkg-coins { font-size: 36px; font-weight: 1000; font-family: 'JetBrains Mono', monospace; color: var(--dark); margin-bottom: 8px; }
+        .pkg-desc { font-size: 13px; color: var(--gray); margin-bottom: 30px; line-height: 1.6; }
+
+        .btn-buy {
+            width: 100%; padding: 16px; border-radius: 16px; border: none;
+            background: linear-gradient(135deg, var(--teal), var(--teal-d)); color: white;
+            font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+            text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 6px 20px rgba(78,205,196,0.25);
+        }
+        .btn-buy:hover { box-shadow: 0 10px 28px rgba(78,205,196,0.4); }
+
+        .pkg-card.popular { transform: scale(1.05); border-color: var(--pink); z-index: 2; box-shadow: 0 20px 50px rgba(255, 107, 157, 0.15); }
+        .pkg-card.popular::before { background: var(--pink); }
+        .pkg-card.popular .btn-buy { background: linear-gradient(135deg, var(--pink), #ff4d8d); box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3); }
+
+        .popular-badge {
+            position: absolute; top: 15px; right: -30px; background: var(--pink); color: white;
+            font-size: 10px; font-weight: 900; padding: 5px 40px; transform: rotate(45deg);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .footer-note { margin-top: 60px; font-size: 13px; color: var(--gray); line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .footer-note span { color: var(--teal-d); font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <nav class="side-menu" id="sideMenu">
+        <div class="sm-head">
+            <div class="sm-logo"><img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo"></div>
+            <div>
+                <div class="sm-brand">Black Cat Ofc</div>
+                <div class="sm-title">Mezuka MD V4</div>
+            </div>
+            <button class="sm-close" onclick="closeMenu()">✕</button>
+        </div>
+        <div class="sm-nav">
+            <button class="sm-btn" onclick="navigate('main.html')">
+                <span class="sm-ico">🏠</span><span class="sm-lbl">Home</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('pair.html')">
+                <span class="sm-ico">🔗</span><span class="sm-lbl">Connect Bot</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('settings.html')">
+                <span class="sm-ico">⚙️</span><span class="sm-lbl">Settings</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('react.html')">
+                <span class="sm-ico">⚡</span><span class="sm-lbl">Auto Reaction</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('shop.html')" style="background:rgba(78,205,196,0.1);color:var(--teal-d)">
+                <span class="sm-ico">🪙</span><span class="sm-lbl">Coin Shop</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('team.html')">
+                <span class="sm-ico">👥</span><span class="sm-lbl">Admin Team</span><span class="sm-arr">›</span>
+            </button>
+            <button class="sm-btn" onclick="navigate('contact.html')">
+                <span class="sm-ico">📩</span><span class="sm-lbl">Contact Us</span><span class="sm-arr">›</span>
+            </button>
+            <div class="sm-sep"></div>
+            <button class="sm-btn" onclick="navigate('tharidu.html')">
+                <span class="sm-ico">🕊️</span><span class="sm-lbl">Who is Tharidu?</span><span class="sm-arr">›</span>
+            </button>
+        </div>
+        <div class="sm-footer">Powered by <span>Mezuka MD V4</span><br>made by <span>nimeshka mihiran</span></div>
+    </nav>
+
+    <nav class="nav">
+        <div class="nav-logo">
+            <div class="tb-menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+            <img src="https://files.catbox.moe/qhrzt2.jpg" alt="logo" style="width:28px;height:28px;border-radius:8px;border:1.5px solid rgba(78,205,196,0.3);">
+            <div class="nav-brand">Mezuka MD <span>V4</span></div>
+        </div>
+        <a class="nav-back" href="react.html">← Back</a>
+    </nav>
+
+
+    <div class="container">
+        
+        <div class="shop-header">
+            <h1>Coin Shop</h1>
+            <p>Get more coins to keep your newsletter auto-reactions running 24/7. 10 Coins = 1 Day of service.</p>
+        </div>
+
+        <div class="packages-grid">
+            <!-- PKG 1 -->
+            <div class="pkg-card">
+                <div class="pkg-ico">🥉</div>
+                <div class="pkg-name">Starter Pack</div>
+                <div class="pkg-coins">10 Coins</div>
+                <p class="pkg-desc">Perfect for a single channel trial for 1 full day.</p>
+                <a href="https://wa.me/94721584279?text=Need%20more%20coin%20package%20Starter%20Pack" class="btn-buy">Buy Package</a>
+            </div>
+
+            <!-- PKG 2 -->
+            <div class="pkg-card popular">
+                <div class="popular-badge">Best Value</div>
+                <div class="pkg-ico">🥈</div>
+                <div class="pkg-name">Silver Pack</div>
+                <div class="pkg-coins">30 Coins</div>
+                <p class="pkg-desc">Stay active for 3 days or manage multiple channels.</p>
+                <a href="https://wa.me/94721584279?text=Need%20more%20coin%20package%20Silver%20Pack" class="btn-buy">Buy Package</a>
+            </div>
+
+            <!-- PKG 3 -->
+            <div class="pkg-card">
+                <div class="pkg-ico">🥇</div>
+                <div class="pkg-name">Gold Pack</div>
+                <div class="pkg-coins">50 Coins</div>
+                <p class="pkg-desc">Long term setup for power users. 5 days of reactions.</p>
+                <a href="https://wa.me/94721584279?text=Need%20more%20coin%20package%20Gold%20Pack" class="btn-buy">Buy Package</a>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <p>After clicking <span>"Buy Package"</span>, you will be redirected to WhatsApp. Please send the pre-filled message to <span>Nimeshka (Owner)</span>. Coins will be added to your account after verification.</p>
+        </div>
+
+    </div>
+
+    <script>
+        /* ── SIDE MENU LOGIC ── */
+        let menuOpen = false;
+        function openMenu(){
+            if(menuOpen) return;
+            menuOpen = true;
+            document.getElementById('sideMenu').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+            document.body.style.overflow='hidden';
+        }
+        function closeMenu(){
+            if(!menuOpen) return;
+            menuOpen = false;
+            document.getElementById('sideMenu').classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+            document.body.style.overflow='';
+        }
+        function navigate(page){
+            closeMenu();
+            setTimeout(()=>window.location.href=page, 180);
+        }
+    </script>
+</body>
+</html>
+
