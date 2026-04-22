@@ -1,4 +1,3 @@
-
 require('dotenv').config({ path: './config.env' });
 
 const express = require('express');
@@ -202,7 +201,7 @@ app.get('/ping', (req, res) =>
   res.json({ status: 'alive', uptime: process.uptime() }));
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /code  — Pair Code Route
+// /code  — Pair Code Route  ✅ FIXED
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.get('/code', async (req, res) => {
@@ -233,6 +232,7 @@ app.get('/code', async (req, res) => {
       default: makeWASocket,
       useMultiFileAuthState,
       makeCacheableSignalKeyStore,
+      fetchLatestBaileysVersion,   // ✅ FIX: Latest version fetch
       delay: waDelay
     } = require('@whiskeysockets/baileys');
     const P   = require('pino');
@@ -250,72 +250,96 @@ app.get('/code', async (req, res) => {
     const { state, saveCreds } = await useMultiFileAuthState(sessionFolder);
     const logger = P({ level: 'silent' });
 
+    // ✅ FIX 1: Fetch latest WA version — hardcoded version 515 cause කරනවා
+    const { version } = await fetchLatestBaileysVersion();
+    console.log(`📌 [PAIR] Using WA version: ${version.join('.')}`);
+
     const pairSocket = makeWASocket({
-      version: [2, 3000, 1033105955],
+      version,
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
       printQRInTerminal: false,
       logger,
-      browser: ['Ubuntu', 'Chrome', '20.0.04']
+      // ✅ FIX 2: Valid browser fingerprint — Chrome 20 reject කළා
+      browser: ['Ubuntu', 'Chrome', '120.0.0'],
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 10000,
     });
 
     pairSocket.ev.on('creds.update', saveCreds);
 
+    let codeSent = false;
+
     pairSocket.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect } = update;
 
+      // ✅ FIX 3: Connection open වුනාට පස්සේ code request කරනවා
       if (connection === 'open') {
-        console.log(`✅ [PAIR] Code success: ${sanitizedNumber}`);
+        console.log(`🔗 [PAIR] WS Open: ${sanitizedNumber}`);
+
+        if (!pairSocket.authState.creds.registered && !codeSent) {
+          codeSent = true;
+          let code;
+          let retries = 5;
+          while (retries > 0) {
+            try {
+              // ✅ FIX 4: Proper delay after WS open
+              await waDelay(3000);
+              code = await pairSocket.requestPairingCode(sanitizedNumber);
+              break;
+            } catch (err) {
+              retries--;
+              console.log(`⚠️  [PAIR] Retry ${5 - retries}/5: ${err.message}`);
+              if (retries === 0) throw err;
+              await waDelay(3000);
+            }
+          }
+
+          const formattedCode = code ? code.match(/.{1,4}/g)?.join('-') : code;
+          console.log(`📋 [PAIR] Code: ${formattedCode} | ${sanitizedNumber}`);
+
+          if (!res.headersSent) {
+            res.json({
+              status: 'success',
+              number: sanitizedNumber,
+              code: formattedCode,
+              message: 'WhatsApp > Linked Devices > Link a Device > Enter Code'
+            });
+          }
+        }
+      }
+
+      // User code enter කළාම connection open වෙනවා (2nd time)
+      if (connection === 'open' && pairSocket.authState.creds.registered) {
+        console.log(`✅ [PAIR] Code accepted: ${sanitizedNumber}`);
         try {
           await saveSessionToMongo(sanitizedNumber, sessionFolder);
         } catch (e) {
           console.error(`❌ [PAIR] MongoDB save failed: ${e.message}`);
         }
-        // Socket close ONLY — bot connect නෑ
         try { pairSocket.ws.close(); } catch (_) {}
       }
 
       if (connection === 'close') {
         const statusCode = new (require('@hapi/boom').Boom)(lastDisconnect?.error)?.output?.statusCode;
         console.log(`⚠️  [PAIR] Code socket closed: ${sanitizedNumber} | code: ${statusCode}`);
-        // Reconnect නෑ
+
+        // 515 = loggedOut / rejected — retry නෑ
+        // 408 = timeout — retry නෑ
+        // 401 = unauthorized — retry නෑ
+
+        if (!res.headersSent && !codeSent) {
+          res.status(500).json({
+            error: 'Connection closed before code generation',
+            code: statusCode,
+            number: sanitizedNumber
+          });
+        }
       }
     });
 
-    if (!pairSocket.authState.creds.registered) {
-      let code;
-      let retries = 5;
-      while (retries > 0) {
-        try {
-          await waDelay(1500);
-          code = await pairSocket.requestPairingCode(sanitizedNumber);
-          break;
-        } catch (err) {
-          retries--;
-          if (retries === 0) throw err;
-          await waDelay(2000);
-        }
-      }
-
-      const formattedCode = code ? code.match(/.{1,4}/g)?.join('-') : code;
-      console.log(`📋 [PAIR] Code: ${formattedCode} | ${sanitizedNumber}`);
-
-      if (!res.headersSent) {
-        return res.json({
-          status: 'success',
-          number: sanitizedNumber,
-          code: formattedCode,
-          message: 'WhatsApp > Linked Devices > Link a Device > Enter Code'
-        });
-      }
-    } else {
-      if (!res.headersSent) {
-        return res.json({
-          status: 'already_registered',
-          message: 'Number already has a session file.',
-          number: sanitizedNumber
-        });
-      }
-    }
+    // ✅ FIX 5: registered check connection open event ඇතුළෙ — මෙතන නෑ
+    // (old code: immediately checked registered before WS was open → race condition)
 
   } catch (err) {
     console.error(`❌ [PAIR] Code route error:`, err.message);
@@ -330,7 +354,7 @@ app.get('/code', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /api/qr  — QR Route
+// /api/qr  — QR Route  ✅ FIXED
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.get('/api/qr', async (req, res) => {
@@ -352,7 +376,8 @@ app.get('/api/qr', async (req, res) => {
     const {
       default: makeWASocket,
       useMultiFileAuthState,
-      makeCacheableSignalKeyStore
+      makeCacheableSignalKeyStore,
+      fetchLatestBaileysVersion   // ✅ FIX
     } = require('@whiskeysockets/baileys');
     const P   = require('pino');
     const fse = require('fs-extra');
@@ -363,12 +388,19 @@ app.get('/api/qr', async (req, res) => {
     const { state, saveCreds } = await useMultiFileAuthState(sessionFolder);
     const logger = P({ level: 'silent' });
 
+    // ✅ FIX: Latest WA version
+    const { version } = await fetchLatestBaileysVersion();
+
     const pairSocket = makeWASocket({
-      version: [2, 3000, 1033105955],
+      version,
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
       printQRInTerminal: false,
       logger,
-      browser: ['Ubuntu', 'Chrome', '20.0.04']
+      // ✅ FIX: Valid browser
+      browser: ['Ubuntu', 'Chrome', '120.0.0'],
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 10000,
     });
 
     pairSocket.ev.on('creds.update', saveCreds);
@@ -454,6 +486,16 @@ app.post('/api/settings/login', async (req, res) => {
     const saved = await getPassword(sanitized);
     if (!saved || saved !== password.toUpperCase())
       return res.status(401).json({ ok: false, error: 'Invalid number or password' });
+    res.json({ ok: true, number: sanitized });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
+});
+
+app.post('/api/settings/register', async (req, res) => {
+  try {
+    const { number, password } = req.body;
+    if (!number || !password) return res.status(400).json({ ok: false, error: 'Missing fields' });
+    const sanitized = number.replace(/[^0-9]/g, '');
+    await savePassword(sanitized, password.toUpperCase());
     res.json({ ok: true, number: sanitized });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
@@ -650,6 +692,7 @@ app.post('/api/react/add-task', async (req, res) => {
 
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + parseInt(days));
+
     const emojiArray = emojis ? emojis.split(',').map(e => e.trim()).filter(Boolean) : [];
 
     const col = await getArCol('newsletter_reacts');
@@ -810,7 +853,6 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/api/sessions', async (req, res) => {
   try {
-    // MongoDB එකේ saved sessions list කරනවා
     const col = await getMainCol();
     const docs = await col.find({}, { projection: { ownerNumber: 1, updatedAt: 1 } }).toArray();
     const sessions = docs.map(d => ({
@@ -848,3 +890,4 @@ app.listen(PORT, () => {
   console.log(`║  ❌ Bot connect — disabled intentionally ║`);
   console.log(`╚══════════════════════════════════════════╝\n`);
 });
+
