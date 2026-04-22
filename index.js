@@ -6,7 +6,7 @@ const { MongoClient } = require('mongodb');
 const config  = require('./config');
 
 // ─── ENV ──────────────────────────────────────────────────────────────────────
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://nimeshmihirangadoc_db_user:68Q1QfxxPesf5c5p@cluster0.cttw5wq.mongodb.net';
 const PORT        = process.env.PORT || 8002;
 
 // ─── MongoDB clients ──────────────────────────────────────────────────────────
