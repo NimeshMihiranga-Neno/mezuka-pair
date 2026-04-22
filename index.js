@@ -348,15 +348,21 @@ app.get("/code", async (req, res) => {
       },
       printQRInTerminal: false,
       logger,
-      browser: ["Ubuntu", "Chrome", "20.0.04"],
+      browser: ["Mezuka MD", "Chrome", "20.0.04"],
+      generateHighQualityLinkPreview: false,
     });
 
     pairSocket.ev.on('creds.update', saveCreds);
+
+    // Flag: pair success una gaman close event eken double connect prevent karanna
+    let pairDone = false;
 
     pairSocket.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect } = update;
 
       if (connection === 'open') {
+        if (pairDone) return; // Double fire prevent
+        pairDone = true;
         console.log(`✅ Pairing successful for ${sanitizedNumber}`);
 
         try {
@@ -391,15 +397,22 @@ app.get("/code", async (req, res) => {
           console.error(`❌ Failed to save session to MongoDB:`, saveErr.message);
         }
 
+        // pairSocket properly destroy karanna — close event eka trigger wenna denna
+        try { pairSocket.ev.removeAllListeners(); } catch(e) {}
         try { pairSocket.ws.close(); } catch(e) {}
         global.WA_SESSIONS.delete(sanitizedNumber);
-        connectToWA(sanitizedNumber, sessionFolder);
+        // Small delay — ws.close() process wenakan inna
+        setTimeout(() => connectToWA(sanitizedNumber, sessionFolder), 1000);
       }
 
       if (connection === 'close') {
+        // pairDone nam (successfully paired) close event ignore karanna
+        // Double connectToWA prevent
+        if (pairDone) return;
         const statusCode = new (require('@hapi/boom').Boom)(lastDisconnect?.error)?.output?.statusCode;
         const loggedOut = statusCode === 401;
         console.log(`⚠️ PairSocket closed for ${sanitizedNumber}, code: ${statusCode}`);
+        // Only reconnect if pair completely failed (not just socket closed after pair)
         if (!loggedOut && !global.WA_SESSIONS.has(sanitizedNumber)) {
           setTimeout(() => connectToWA(sanitizedNumber, sessionFolder), 3000);
         }
@@ -409,15 +422,19 @@ app.get("/code", async (req, res) => {
     if (!pairSocket.authState.creds.registered) {
       let code;
       let retries = 5;
+
+      // Socket ready වෙනකං wait karanna (max 8s) — race condition fix
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       while (retries > 0) {
         try {
-          await waDelay(1500);
           code = await pairSocket.requestPairingCode(sanitizedNumber);
           break;
         } catch (err) {
           retries--;
+          console.log(`⚠️ Pair code retry ${5 - retries}/5 for ${sanitizedNumber}: ${err.message}`);
           if (retries === 0) throw err;
-          await waDelay(2000);
+          await waDelay(2500);
         }
       }
 
@@ -981,4 +998,5 @@ app.get("/api/sessions", async (req, res) => {
 app.listen(port, () => {
   console.log(`🌐 Express server listening at http://localhost:${port}`);
 });
+
 
