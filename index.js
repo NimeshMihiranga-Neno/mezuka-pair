@@ -1,19 +1,31 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║          MEZUKA MD — PAIR + FULL WEB SERVER                      ║
+ * ║                                                                  ║
+ * ║  ✅ /code          → Pair Code  → MongoDB Save                   ║
+ * ║  ✅ /api/qr        → QR Scan    → MongoDB Save                   ║
+ * ║  ✅ All HTML Pages                                               ║
+ * ║  ✅ Settings / AutoReply / Scheduled / React / Newsletter APIs   ║
+ * ║  ❌ Bot connect / Session load / Commands — කිසිම දෙයක් නෑ        ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ */
+
 require('dotenv').config({ path: './config.env' });
 
 const express = require('express');
 const path    = require('path');
+const crypto  = require('crypto');
 const { MongoClient } = require('mongodb');
 const config  = require('./config');
 
 // ─── ENV ──────────────────────────────────────────────────────────────────────
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://neni:w2jUCfhl2DeTS3is@cluster0.d7uhe8y.mongodb.net/';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const PORT        = process.env.PORT || 8002;
 
-// ─── MongoDB clients ──────────────────────────────────────────────────────────
+// ─── MongoDB ──────────────────────────────────────────────────────────────────
 const mainClient = new MongoClient(MONGODB_URI, { maxPoolSize: 5 });
 const arClient   = new MongoClient(MONGODB_URI, { maxPoolSize: 5 });
 
-// Main sessions collection
 async function getMainCol() {
   try { await mainClient.connect(); } catch (e) {
     if (!e.message.includes('already been connected')) throw e;
@@ -21,7 +33,6 @@ async function getMainCol() {
   return mainClient.db('MEZUKADB').collection(config.NENO_DATA);
 }
 
-// AutoReply / Scheduled / Newsletter collections
 let arDB = null;
 async function getArCol(colName) {
   try { await arClient.connect(); } catch (e) {
@@ -36,11 +47,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── QR Session store ─────────────────────────────────────────────────────────
 if (!global.QR_SESSIONS) global.QR_SESSIONS = new Map();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DATABASE HELPERS  (database.js ට depend නෑ — direct MongoDB)
+// DB HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function readEnv(ownerNumber) {
@@ -64,16 +74,6 @@ async function getPassword(ownerNumber) {
   return doc?.password || null;
 }
 
-async function savePassword(ownerNumber, password) {
-  const col = await getMainCol();
-  await col.updateOne(
-    { ownerNumber },
-    { $set: { password, updatedAt: new Date() } },
-    { upsert: true }
-  );
-}
-
-// Signup/Login for react panel
 async function signupReactUser(ownerNumber, username, password) {
   const col = await getArCol('react_users');
   let user = await col.findOne({ ownerNumber });
@@ -106,12 +106,9 @@ async function claimDailyCoins(ownerNumber) {
   if (!user) return { ok: false, error: 'User not found' };
   const now = new Date();
   const last = user.lastClaim ? new Date(user.lastClaim) : null;
-  if (last) {
-    const diffHours = (now - last) / (1000 * 60 * 60);
-    if (diffHours < 24) {
-      const remaining = Math.ceil(24 - diffHours);
-      return { ok: false, error: `Next claim in ${remaining} hours` };
-    }
+  if (last && (now - last) / (1000 * 60 * 60) < 24) {
+    const remaining = Math.ceil(24 - (now - last) / (1000 * 60 * 60));
+    return { ok: false, error: `Next claim in ${remaining} hours` };
   }
   await col.updateOne({ ownerNumber }, { $inc: { coins: 50 }, $set: { lastClaim: now } });
   return { ok: true, coinsAdded: 50, totalCoins: (user.coins || 0) + 50 };
@@ -121,7 +118,7 @@ async function redeemCode(ownerNumber, code) {
   const codesCol = await getArCol('redeem_codes');
   const codeDoc = await codesCol.findOne({ code });
   if (!codeDoc) return { ok: false, error: 'Invalid code' };
-  if (codeDoc.usedBy && codeDoc.usedBy.includes(ownerNumber)) return { ok: false, error: 'Already redeemed' };
+  if (codeDoc.usedBy?.includes(ownerNumber)) return { ok: false, error: 'Already redeemed' };
   if (codeDoc.maxUses && (codeDoc.usedBy || []).length >= codeDoc.maxUses) return { ok: false, error: 'Code expired' };
   const usersCol = await getArCol('react_users');
   await usersCol.updateOne({ ownerNumber }, { $inc: { coins: codeDoc.coins || 0 } });
@@ -129,7 +126,6 @@ async function redeemCode(ownerNumber, code) {
   return { ok: true, coinsAdded: codeDoc.coins || 0 };
 }
 
-// Auth helper
 async function checkAuth(number, password) {
   if (!number || !password) return null;
   const sanitized = number.replace(/[^0-9]/g, '');
@@ -139,23 +135,18 @@ async function checkAuth(number, password) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SESSION SAVE HELPER
+// SESSION SAVE — MongoDB only, bot connect නෑ
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function saveSessionToMongo(ownerNumber, sessionFolder) {
   const fse = require('fs-extra');
   const sessionData = {};
-  try {
-    const files = await fse.readdir(sessionFolder);
-    for (const file of files) {
-      try {
-        const raw = await fse.readFile(path.join(sessionFolder, file), 'utf8');
-        sessionData[file] = JSON.parse(raw);
-      } catch (_) {}
-    }
-  } catch (e) {
-    console.error(`❌ [PAIR] Session folder read error: ${e.message}`);
-    throw e;
+  const files = await fse.readdir(sessionFolder);
+  for (const file of files) {
+    try {
+      const raw = await fse.readFile(path.join(sessionFolder, file), 'utf8');
+      sessionData[file] = JSON.parse(raw);
+    } catch (_) {}
   }
   const credsData = sessionData['creds.json'] || {};
   const col = await getMainCol();
@@ -164,7 +155,7 @@ async function saveSessionToMongo(ownerNumber, sessionFolder) {
     { $set: { ownerNumber, sid: credsData, sessionFiles: sessionData, updatedAt: new Date() } },
     { upsert: true }
   );
-  console.log(`💾 [PAIR] MongoDB saved ✅ | ${ownerNumber} | ${Object.keys(sessionData).length} files`);
+  console.log(`💾 [PAIR] Saved to MongoDB ✅ | ${ownerNumber} | ${Object.keys(sessionData).length} files`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -174,58 +165,43 @@ async function saveSessionToMongo(ownerNumber, sessionFolder) {
 const HTML = (name) => (req, res) =>
   res.sendFile(path.join(__dirname, 'mezuka', name));
 
-app.get('/',             HTML('main.html'));
-app.get('/home',         HTML('main.html'));
-app.get('/main.html',    HTML('main.html'));
-app.get('/pair',         HTML('pair.html'));
-app.get('/pair.html',    HTML('pair.html'));
-app.get('/settings',     HTML('settings.html'));
-app.get('/settings.html',HTML('settings.html'));
-app.get('/shop',         HTML('shop.html'));
-app.get('/shop.html',    HTML('shop.html'));
-app.get('/react',        HTML('react.html'));
-app.get('/react.html',   HTML('react.html'));
-app.get('/team.html',    HTML('team.html'));
-app.get('/contact.html', HTML('contact.html'));
-app.get('/tharidu.html', HTML('tharidu.html'));
-
-// image.js dynamic loader
-app.get('/image.js', (req, res) =>
-  res.sendFile(path.join(__dirname, 'image.js')));
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HEALTH CHECK
-// ─────────────────────────────────────────────────────────────────────────────
+app.get('/',              HTML('main.html'));
+app.get('/home',          HTML('main.html'));
+app.get('/main.html',     HTML('main.html'));
+app.get('/pair',          HTML('pair.html'));
+app.get('/pair.html',     HTML('pair.html'));
+app.get('/settings',      HTML('settings.html'));
+app.get('/settings.html', HTML('settings.html'));
+app.get('/shop',          HTML('shop.html'));
+app.get('/shop.html',     HTML('shop.html'));
+app.get('/react',         HTML('react.html'));
+app.get('/react.html',    HTML('react.html'));
+app.get('/team.html',     HTML('team.html'));
+app.get('/contact.html',  HTML('contact.html'));
+app.get('/tharidu.html',  HTML('tharidu.html'));
+app.get('/image.js',      (req, res) => res.sendFile(path.join(__dirname, 'image.js')));
 
 app.get('/ping', (req, res) =>
   res.json({ status: 'alive', uptime: process.uptime() }));
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /code  — Pair Code Route
+// /code  — Pair Code  (ඔයාගේ original working code — bot connect parts only remove)
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.get('/code', async (req, res) => {
   const { number } = req.query;
-  if (!number) return res.status(400).json({ error: 'Usage: /code?number=94712345678' });
+
+  if (!number) {
+    return res.status(400).json({ error: 'Number parameter is required. Usage: /code?number=94712345678' });
+  }
 
   const sanitizedNumber = number.replace(/[^0-9]/g, '');
-  if (!sanitizedNumber || sanitizedNumber.length < 7)
+
+  if (!sanitizedNumber || sanitizedNumber.length < 7) {
     return res.status(400).json({ error: 'Invalid phone number.' });
+  }
 
-  // Already saved check
-  try {
-    const col = await getMainCol();
-    const existing = await col.findOne({ ownerNumber: sanitizedNumber });
-    if (existing?.sid) {
-      return res.status(200).json({
-        status: 'already_saved',
-        message: 'This number already has a saved session in MongoDB.',
-        number: sanitizedNumber
-      });
-    }
-  } catch (_) {}
-
-  console.log(`📞 [PAIR] Code requested: ${sanitizedNumber}`);
+  console.log(`📞 Pairing code requested for ${sanitizedNumber}`);
 
   try {
     const {
@@ -234,16 +210,17 @@ app.get('/code', async (req, res) => {
       makeCacheableSignalKeyStore,
       delay: waDelay
     } = require('@whiskeysockets/baileys');
-    const P   = require('pino');
+    const P = require('pino');
     const fse = require('fs-extra');
 
     const sessionFolder = path.join(__dirname, 'auth_info_baileys', sanitizedNumber);
     await fse.ensureDir(sessionFolder);
 
+    // Delete old creds if exist (fresh pairing)
     const credsFile = path.join(sessionFolder, 'creds.json');
     if (fse.existsSync(credsFile)) {
       await fse.remove(credsFile);
-      console.log(`🗑️  [PAIR] Old creds cleared: ${sanitizedNumber}`);
+      console.log(`🗑️ Cleared old creds for ${sanitizedNumber}`);
     }
 
     const { state, saveCreds } = await useMultiFileAuthState(sessionFolder);
@@ -251,10 +228,13 @@ app.get('/code', async (req, res) => {
 
     const pairSocket = makeWASocket({
       version: [2, 3000, 1033105955],
-      auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, logger)
+      },
       printQRInTerminal: false,
       logger,
-      browser: ['Ubuntu', 'Chrome', '20.0.04']
+      browser: ["Ubuntu", "Chrome", "20.0.04"],
     });
 
     pairSocket.ev.on('creds.update', saveCreds);
@@ -263,23 +243,45 @@ app.get('/code', async (req, res) => {
       const { connection, lastDisconnect } = update;
 
       if (connection === 'open') {
-        console.log(`✅ [PAIR] Code success: ${sanitizedNumber}`);
+        console.log(`✅ Pairing successful for ${sanitizedNumber}`);
+
         try {
-          await saveSessionToMongo(sanitizedNumber, sessionFolder);
-        } catch (e) {
-          console.error(`❌ [PAIR] MongoDB save failed: ${e.message}`);
+          // Save full session (creds + all signal keys) to MongoDB
+          const sessionData = {};
+          const sessionFiles = await fse.readdir(sessionFolder);
+          for (const file of sessionFiles) {
+            try {
+              const content = await fse.readFile(path.join(sessionFolder, file), 'utf8');
+              sessionData[file] = JSON.parse(content);
+            } catch(e) {}
+          }
+          const credsData = sessionData['creds.json'] || {};
+
+          const col = await getMainCol();
+          await col.updateOne(
+            { ownerNumber: sanitizedNumber },
+            { $set: { ownerNumber: sanitizedNumber, sid: credsData, sessionFiles: sessionData, updatedAt: new Date() } },
+            { upsert: true }
+          );
+
+          console.log(`💾 Session saved to MongoDB for ${sanitizedNumber} (${Object.keys(sessionData).length} files)`);
+
+        } catch (saveErr) {
+          console.error(`❌ Failed to save session to MongoDB:`, saveErr.message);
         }
-        // Socket close ONLY — bot connect නෑ
-        try { pairSocket.ws.close(); } catch (_) {}
+
+        // ❌ connectToWA නෑ — socket close කරනවා විතරයි
+        try { pairSocket.ws.close(); } catch(e) {}
       }
 
       if (connection === 'close') {
         const statusCode = new (require('@hapi/boom').Boom)(lastDisconnect?.error)?.output?.statusCode;
-        console.log(`⚠️  [PAIR] Code socket closed: ${sanitizedNumber} | code: ${statusCode}`);
-        // Reconnect නෑ
+        console.log(`⚠️ PairSocket closed for ${sanitizedNumber}, code: ${statusCode}`);
+        // ❌ reconnect නෑ, bot start නෑ
       }
     });
 
+    // Request pairing code — original exact logic
     if (!pairSocket.authState.creds.registered) {
       let code;
       let retries = 5;
@@ -296,32 +298,33 @@ app.get('/code', async (req, res) => {
       }
 
       const formattedCode = code ? code.match(/.{1,4}/g)?.join('-') : code;
-      console.log(`📋 [PAIR] Code: ${formattedCode} | ${sanitizedNumber}`);
+      console.log(`📋 Pairing code for ${sanitizedNumber}: ${formattedCode}`);
 
       if (!res.headersSent) {
         return res.json({
           status: 'success',
           number: sanitizedNumber,
           code: formattedCode,
-          message: 'WhatsApp > Linked Devices > Link a Device > Enter Code'
+          message: `WhatsApp > Linked Devices > Link a Device > Enter Code`
         });
       }
     } else {
+      // Already registered — ❌ connectToWA නෑ
       if (!res.headersSent) {
         return res.json({
           status: 'already_registered',
-          message: 'Number already has a session file.',
+          message: 'Number already has a session.',
           number: sanitizedNumber
         });
       }
     }
 
   } catch (err) {
-    console.error(`❌ [PAIR] Code route error:`, err.message);
+    console.error(`❌ Pairing error for ${sanitizedNumber}:`, err);
     if (!res.headersSent) {
       return res.status(500).json({
         error: 'Failed to generate pairing code',
-        message: err.message,
+        message: err.message || 'Unknown error',
         number: sanitizedNumber
       });
     }
@@ -367,7 +370,10 @@ app.get('/api/qr', async (req, res) => {
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
       printQRInTerminal: false,
       logger,
-      browser: ['Ubuntu', 'Chrome', '20.0.04']
+      browser: ['Ubuntu', 'Chrome', '20.0.04'],
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 10000,
     });
 
     pairSocket.ev.on('creds.update', saveCreds);
@@ -389,13 +395,10 @@ app.get('/api/qr', async (req, res) => {
         setTimeout(() => global.QR_SESSIONS.delete(sessionId), 60000);
 
         try {
-          const fse2 = require('fs-extra');
           const newFolder = path.join(__dirname, 'auth_info_baileys', actualNumber);
-          if (fse2.existsSync(newFolder)) await fse2.remove(newFolder);
-          await fse2.copy(sessionFolder, newFolder);
-          await fse2.remove(sessionFolder);
-
-          // MongoDB save ONLY — bot connect නෑ
+          if (fse.existsSync(newFolder)) await fse.remove(newFolder);
+          await fse.copy(sessionFolder, newFolder);
+          await fse.remove(sessionFolder);
           await saveSessionToMongo(actualNumber, newFolder);
         } catch (e) {
           console.error(`❌ [PAIR] QR MongoDB save failed: ${e.message}`);
@@ -411,7 +414,7 @@ app.get('/api/qr', async (req, res) => {
           clearTimeout(SESSION_TIMEOUT);
           setTimeout(() => {
             global.QR_SESSIONS.delete(sessionId);
-            try { require('fs-extra').remove(sessionFolder); } catch (_) {}
+            try { fse.remove(sessionFolder); } catch (_) {}
           }, 30000);
         }
         try { pairSocket.ws.close(); } catch (_) {}
@@ -459,8 +462,7 @@ app.post('/api/settings/login', async (req, res) => {
 
 app.post('/api/settings/get', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const settings = await readEnv(san);
     res.json({ ok: true, settings });
@@ -470,7 +472,7 @@ app.post('/api/settings/get', async (req, res) => {
 app.post('/api/settings/update', async (req, res) => {
   try {
     const { number, password, key, value } = req.body;
-    if (!number || !password || !key) return res.status(400).json({ ok: false, error: 'Missing fields' });
+    if (!key) return res.status(400).json({ ok: false, error: 'Missing key' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     await updateEnv(san, key, value);
@@ -484,14 +486,11 @@ app.post('/api/settings/update', async (req, res) => {
 
 app.post('/api/autoreply/list', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const col = await getArCol('auto_replies');
     const replies = await col.find({ sessionNumber: san }).toArray();
-    const mapped = replies.map(d => ({ trigger: d.trigger, response: d.response, enabled: d.enabled }));
-    const anyDoc = replies[0];
-    res.json({ ok: true, replies: mapped, enabled: anyDoc ? anyDoc.enabled : true });
+    res.json({ ok: true, replies: replies.map(d => ({ trigger: d.trigger, response: d.response, enabled: d.enabled })), enabled: replies[0]?.enabled ?? true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -502,11 +501,11 @@ app.post('/api/autoreply/add', async (req, res) => {
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const col = await getArCol('auto_replies');
-    const count = await col.countDocuments({ sessionNumber: san });
-    if (count >= 20) return res.status(400).json({ ok: false, error: 'Maximum 20 auto-replies allowed' });
+    if (await col.countDocuments({ sessionNumber: san }) >= 20)
+      return res.status(400).json({ ok: false, error: 'Maximum 20 auto-replies allowed' });
     try {
       await col.insertOne({ sessionNumber: san, trigger: trigger.toLowerCase().trim(), response, enabled: true, createdAt: new Date() });
-      res.json({ ok: true, message: 'Auto reply added' });
+      res.json({ ok: true });
     } catch (e) {
       if (e.code === 11000) return res.status(400).json({ ok: false, error: 'Trigger already exists' });
       throw e;
@@ -531,8 +530,7 @@ app.post('/api/autoreply/toggle', async (req, res) => {
     const { number, password, enabled } = req.body;
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('auto_replies');
-    await col.updateMany({ sessionNumber: san }, { $set: { enabled } });
+    await (await getArCol('auto_replies')).updateMany({ sessionNumber: san }, { $set: { enabled } });
     res.json({ ok: true, message: `Auto reply ${enabled ? 'ON' : 'OFF'}` });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
@@ -541,18 +539,13 @@ app.post('/api/autoreply/toggle', async (req, res) => {
 // SCHEDULED MESSAGES API
 // ─────────────────────────────────────────────────────────────────────────────
 
-const crypto = require('crypto');
-
 app.post('/api/scheduled/list', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const col = await getArCol('scheduled_messages');
     const msgs = await col.find({ sessionNumber: san }).toArray();
-    const mapped = msgs.map(d => ({ id: d.id, recipientName: d.recipientName, recipientNumber: d.recipientNumber, message: d.message, day: d.day, time: d.time, enabled: d.enabled, lastSent: d.lastSent }));
-    const enabled = msgs[0] ? msgs[0].enabled : true;
-    res.json({ ok: true, messages: mapped, enabled });
+    res.json({ ok: true, messages: msgs.map(d => ({ id: d.id, recipientName: d.recipientName, recipientNumber: d.recipientNumber, message: d.message, day: d.day, time: d.time, enabled: d.enabled, lastSent: d.lastSent })), enabled: msgs[0]?.enabled ?? true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -564,21 +557,12 @@ app.post('/api/scheduled/add', async (req, res) => {
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const col = await getArCol('scheduled_messages');
-    const count = await col.countDocuments({ sessionNumber: san });
-    if (count >= 20) return res.status(400).json({ ok: false, error: 'Maximum 20 scheduled messages allowed' });
+    if (await col.countDocuments({ sessionNumber: san }) >= 20)
+      return res.status(400).json({ ok: false, error: 'Maximum 20 allowed' });
     const id = crypto.randomBytes(8).toString('hex');
-    await col.insertOne({
-      sessionNumber: san, id,
-      recipientName: recipientName || null,
-      recipientNumber: recipientNumber.replace(/[^0-9]/g, ''),
-      message, day: day.toLowerCase(), time,
-      enabled: true, createdAt: new Date(), lastSent: null
-    });
-    res.json({ ok: true, message: 'Scheduled message added', id });
-  } catch (err) {
-    if (err.message === 'MESSAGE_REQUIRED') return res.status(400).json({ ok: false, error: 'Message required' });
-    res.status(500).json({ ok: false, error: err.message });
-  }
+    await col.insertOne({ sessionNumber: san, id, recipientName: recipientName || null, recipientNumber: recipientNumber.replace(/[^0-9]/g, ''), message, day: day.toLowerCase(), time, enabled: true, createdAt: new Date(), lastSent: null });
+    res.json({ ok: true, id });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 app.post('/api/scheduled/delete', async (req, res) => {
@@ -587,8 +571,7 @@ app.post('/api/scheduled/delete', async (req, res) => {
     if (!id) return res.status(400).json({ ok: false, error: 'id required' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('scheduled_messages');
-    await col.deleteOne({ sessionNumber: san, id });
+    await (await getArCol('scheduled_messages')).deleteOne({ sessionNumber: san, id });
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
@@ -598,9 +581,8 @@ app.post('/api/scheduled/toggle', async (req, res) => {
     const { number, password, enabled } = req.body;
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('scheduled_messages');
-    await col.updateMany({ sessionNumber: san }, { $set: { enabled } });
-    res.json({ ok: true, message: `Scheduled messages ${enabled ? 'ON' : 'OFF'}` });
+    await (await getArCol('scheduled_messages')).updateMany({ sessionNumber: san }, { $set: { enabled } });
+    res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -612,8 +594,7 @@ app.post('/api/react/auth', async (req, res) => {
   try {
     const { number, username, password } = req.body;
     if (!number || !password) return res.status(400).json({ ok: false, error: 'Missing fields' });
-    const san = number.replace(/[^0-9]/g, '');
-    const result = await signupReactUser(san, username || 'User', password);
+    const result = await signupReactUser(number.replace(/[^0-9]/g, ''), username || 'User', password);
     if (!result.ok) return res.status(401).json(result);
     res.json(result);
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
@@ -621,11 +602,9 @@ app.post('/api/react/auth', async (req, res) => {
 
 app.post('/api/react/user', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const info = await getReactUserInfo(san);
-    res.json({ ok: true, ...info });
+    res.json({ ok: true, ...(await getReactUserInfo(san)) });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -635,51 +614,36 @@ app.post('/api/react/add-task', async (req, res) => {
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     if (!jid || !days) return res.status(400).json({ ok: false, error: 'jid and days required' });
-
-    const cost = parseInt(days) * 10;
-    const deducted = await deductReactCoins(san, cost);
-    if (!deducted) return res.status(400).json({ ok: false, error: 'Insufficient coins' });
-
+    if (!await deductReactCoins(san, parseInt(days) * 10))
+      return res.status(400).json({ ok: false, error: 'Insufficient coins' });
     let targetJid = jid.trim();
-    if (targetJid.includes('whatsapp.com/channel/')) {
+    if (targetJid.includes('whatsapp.com/channel/'))
       targetJid = targetJid.split('channel/')[1].split('/')[0].split('?')[0] + '@newsletter';
-    } else if (!targetJid.includes('@')) {
+    else if (!targetJid.includes('@'))
       targetJid = targetJid + '@newsletter';
-    }
-
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + parseInt(days));
     const emojiArray = emojis ? emojis.split(',').map(e => e.trim()).filter(Boolean) : [];
-
     const col = await getArCol('newsletter_reacts');
-    await col.updateOne(
-      { jid: targetJid, ownerNumber: san },
-      { $set: { jid: targetJid, ownerNumber: san, emojis: emojiArray, expiryDate: expiry, createdAt: new Date() } },
-      { upsert: true }
-    );
-
+    await col.updateOne({ jid: targetJid, ownerNumber: san }, { $set: { jid: targetJid, ownerNumber: san, emojis: emojiArray, expiryDate: expiry, createdAt: new Date() } }, { upsert: true });
     res.json({ ok: true, expiry });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 app.post('/api/react/list-tasks', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('newsletter_reacts');
-    const tasks = await col.find({ ownerNumber: san }).toArray();
+    const tasks = await (await getArCol('newsletter_reacts')).find({ ownerNumber: san }).toArray();
     res.json({ ok: true, tasks });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 app.post('/api/react/daily-claim', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const result = await claimDailyCoins(san);
-    res.json(result);
+    res.json(await claimDailyCoins(san));
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -689,8 +653,7 @@ app.post('/api/react/redeem', async (req, res) => {
     if (!code) return res.status(400).json({ ok: false, error: 'Code required' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const result = await redeemCode(san, code.trim().toUpperCase());
-    res.json(result);
+    res.json(await redeemCode(san, code.trim().toUpperCase()));
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
@@ -698,21 +661,15 @@ app.post('/api/react/redeem', async (req, res) => {
 // GROUP SETTINGS API
 // ─────────────────────────────────────────────────────────────────────────────
 
-const GROUP_SETTING_KEYS = [
-  'ANTI_LINK', 'ANTI_LINK_ACTION', 'ANTI_LINK_MSG',
-  'ANTI_BAD', 'ANTI_BAD_ACTION', 'ANTI_BAD_MSG', 'BAD_WORDS',
-  'WELCOME', 'WELCOME_MSG',
-  'GOODBYE', 'GOODBYE_MSG'
-];
+const GROUP_KEYS = ['ANTI_LINK','ANTI_LINK_ACTION','ANTI_LINK_MSG','ANTI_BAD','ANTI_BAD_ACTION','ANTI_BAD_MSG','BAD_WORDS','WELCOME','WELCOME_MSG','GOODBYE','GOODBYE_MSG'];
 
 app.post('/api/group/get', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     const settings = await readEnv(san);
     const groupSettings = {};
-    GROUP_SETTING_KEYS.forEach(k => { groupSettings[k] = settings[k] ?? ''; });
+    GROUP_KEYS.forEach(k => { groupSettings[k] = settings[k] ?? ''; });
     res.json({ ok: true, settings: groupSettings });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
@@ -720,7 +677,7 @@ app.post('/api/group/get', async (req, res) => {
 app.post('/api/group/update', async (req, res) => {
   try {
     const { number, password, key, value } = req.body;
-    if (!GROUP_SETTING_KEYS.includes(key)) return res.status(400).json({ ok: false, error: 'Invalid key' });
+    if (!GROUP_KEYS.includes(key)) return res.status(400).json({ ok: false, error: 'Invalid key' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     await updateEnv(san, key, value);
@@ -729,7 +686,7 @@ app.post('/api/group/update', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// NEWSLETTER CHANNEL API  (add / list / delete)
+// NEWSLETTER CHANNEL API
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.post('/api/newsletter/add', async (req, res) => {
@@ -738,32 +695,22 @@ app.post('/api/newsletter/add', async (req, res) => {
     if (!jid) return res.status(400).json({ ok: false, error: 'jid required' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-
     let targetJid = jid.trim();
-    if (targetJid.includes('whatsapp.com/channel/')) {
+    if (targetJid.includes('whatsapp.com/channel/'))
       targetJid = targetJid.split('channel/')[1].split('/')[0].split('?')[0] + '@newsletter';
-    } else if (!targetJid.includes('@')) {
+    else if (!targetJid.includes('@'))
       targetJid = targetJid + '@newsletter';
-    }
-
     const col = await getArCol('newsletter_channels');
-    await col.updateOne(
-      { ownerNumber: san, jid: targetJid },
-      { $set: { ownerNumber: san, jid: targetJid, addedAt: new Date() } },
-      { upsert: true }
-    );
-
-    res.json({ ok: true, jid: targetJid, message: 'Newsletter channel added' });
+    await col.updateOne({ ownerNumber: san, jid: targetJid }, { $set: { ownerNumber: san, jid: targetJid, addedAt: new Date() } }, { upsert: true });
+    res.json({ ok: true, jid: targetJid });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 app.post('/api/newsletter/list', async (req, res) => {
   try {
-    const { number, password } = req.body;
-    const san = await checkAuth(number, password);
+    const san = await checkAuth(req.body.number, req.body.password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('newsletter_channels');
-    const channels = await col.find({ ownerNumber: san }).toArray();
+    const channels = await (await getArCol('newsletter_channels')).find({ ownerNumber: san }).toArray();
     res.json({ ok: true, channels: channels.map(c => ({ jid: c.jid, addedAt: c.addedAt })) });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
@@ -774,14 +721,13 @@ app.post('/api/newsletter/delete', async (req, res) => {
     if (!jid) return res.status(400).json({ ok: false, error: 'jid required' });
     const san = await checkAuth(number, password);
     if (!san) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    const col = await getArCol('newsletter_channels');
-    await col.deleteOne({ ownerNumber: san, jid: jid.trim() });
-    res.json({ ok: true, message: 'Channel removed' });
+    await (await getArCol('newsletter_channels')).deleteOne({ ownerNumber: san, jid: jid.trim() });
+    res.json({ ok: true });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CHAT PROXY API (NVIDIA)
+// CHAT PROXY (NVIDIA)
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.post('/api/chat', async (req, res) => {
@@ -792,35 +738,21 @@ app.post('/api/chat', async (req, res) => {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + NVIDIA_API_KEY },
       body: JSON.stringify(req.body)
     });
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: errText });
-    }
-    const data = await response.json();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: 'Chat proxy failed: ' + err.message });
-  }
+    if (!response.ok) return res.status(response.status).json({ error: await response.text() });
+    res.json(await response.json());
+  } catch (err) { res.status(500).json({ error: 'Chat proxy failed: ' + err.message }); }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SESSIONS STATUS API  (read-only — bot connect නෑ)
+// SESSIONS STATUS
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.get('/api/sessions', async (req, res) => {
   try {
-    // MongoDB එකේ saved sessions list කරනවා
     const col = await getMainCol();
     const docs = await col.find({}, { projection: { ownerNumber: 1, updatedAt: 1 } }).toArray();
-    const sessions = docs.map(d => ({
-      number: d.ownerNumber,
-      status: 'saved',
-      updatedAt: d.updatedAt
-    }));
-    res.json({ ok: true, sessions, count: sessions.length });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
-  }
+    res.json({ ok: true, sessions: docs.map(d => ({ number: d.ownerNumber, status: 'saved', updatedAt: d.updatedAt })), count: docs.length });
+  } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -833,17 +765,8 @@ app.listen(PORT, () => {
   console.log(`╠══════════════════════════════════════════╣`);
   console.log(`║  /code?number=       → Pair Code         ║`);
   console.log(`║  /api/qr             → QR Scan           ║`);
-  console.log(`║  /api/qr/poll        → Poll QR           ║`);
-  console.log(`║  /settings           → Settings Page     ║`);
-  console.log(`║  /api/settings/*     → Settings API      ║`);
-  console.log(`║  /api/autoreply/*    → Auto Reply API    ║`);
-  console.log(`║  /api/scheduled/*    → Scheduled API     ║`);
-  console.log(`║  /api/react/*        → React Panel API   ║`);
-  console.log(`║  /api/newsletter/*   → Newsletter API    ║`);
-  console.log(`║  /api/group/*        → Group Settings    ║`);
-  console.log(`║  /api/sessions       → Saved Sessions    ║`);
-  console.log(`║  /ping               → Health Check      ║`);
-  console.log(`╠══════════════════════════════════════════╣`);
-  console.log(`║  ❌ Bot connect — disabled intentionally ║`);
+  console.log(`║  All web pages & APIs → Active           ║`);
+  console.log(`║  ❌ Bot connect       → Disabled          ║`);
   console.log(`╚══════════════════════════════════════════╝\n`);
 });
+
